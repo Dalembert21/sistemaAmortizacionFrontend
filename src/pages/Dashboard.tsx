@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
   const { config } = useAuth();
-  const institutionName = config?.institutionName || 'Financiero DB';
+  const institutionName = config?.institutionName || 'Sistema Financiero DB';
 
   return (
     <div className="flex flex-col gap-4">

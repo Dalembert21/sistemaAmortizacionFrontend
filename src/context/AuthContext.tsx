@@ -28,10 +28,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   });
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
   const fetchConfig = async (forcedOrgId?: string) => {
     try {
       const targetOrg = forcedOrgId || orgId;
-      const res = await fetch(`http://localhost:3000/api/config/${targetOrg}`);
+      const res = await fetch(`${API_URL}/api/config/${targetOrg}`);
       if (res.ok) {
         const data = await res.json();
         setConfig(data);
@@ -55,10 +57,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    // Limpieza de caché forzada: Si el sistema detecta el nombre viejo guardado
+    // lo sobreescribe con el nuevo default para evitar confusión visual.
+    if (config?.institutionName === 'Financiera Financo') {
+      setConfig({ ...config, institutionName: 'Sistema Financiero DB' });
+    }
+
     if (config?.institutionName) {
       document.title = config.institutionName;
     } else {
-      document.title = 'Sistema Financiero DB';
+      document.title = 'Plataforma Financiera';
     }
 
     if (config?.logoBase64) {
@@ -79,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (user: string, pass: string) => {
     try {
-      const res = await fetch('http://localhost:3000/api/auth/login', {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user, pass })
@@ -104,7 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateConfig = async (newConfig: any) => {
     if (role !== 'ADMIN') return;
     try {
-      const res = await fetch(`http://localhost:3000/api/config/${orgId}`, {
+      const res = await fetch(`${API_URL}/api/config/${orgId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newConfig)
