@@ -254,12 +254,12 @@ const Investment = () => {
             <h3>Validación de Identidad Inteligente</h3>
             <p>Para asegurar tu identidad, la IA comparará la foto de tu cédula con tu rostro real.</p>
             
-            <div className="flex justify-center gap-8 mt-6">
-              <div className="flex-col items-center">
+            <div className="flex justify-center mt-8" style={{ gap: '5rem', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
                 <div style={{ 
-                    width: '140px', height: '140px', 
+                    width: '160px', height: '160px', 
                     border: isCedulaValid ? '2px solid var(--secondary)' : '2px dashed var(--border)', 
-                    borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem', overflow: 'hidden', position: 'relative' 
+                    borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' 
                   }}>
                   {isCedulaValid ? <CheckCircle size={50} color="var(--secondary)" /> : (uploadingDoc ? <div className="spinner"></div> : <Upload size={40} color="var(--text-muted)" />)}
                   <input type="file" accept="image/*" onChange={handleCedulaUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} disabled={uploadingDoc} />
@@ -269,12 +269,12 @@ const Investment = () => {
                 </div>
               </div>
 
-              <div className="flex-col items-center">
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
                 <div style={{ 
-                  width: '150px', height: '150px', 
+                  width: '160px', height: '160px', 
                   border: isBiometricValid ? '2px solid var(--secondary)' : '2px dashed var(--primary)', 
                   borderRadius: '50%', 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   position: 'relative', overflow: 'hidden'
                 }}>
                   {scanning && (

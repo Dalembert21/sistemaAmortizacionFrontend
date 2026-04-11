@@ -163,12 +163,12 @@ const Simulator = () => {
 
         <div className="glass-panel" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div className="flex justify-between items-center mb-4">
-            <h3>Tabla de Pagos</h3>
+            <h3 style={{ margin: 0 }}>Tabla de Pagos</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               {table.length === 0 && (
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                <div style={{ background: 'rgba(var(--primary-rgb), 0.1)', borderLeft: '4px solid var(--primary)', padding: '0.6rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text)', fontSize: '0.9rem', fontWeight: '500' }}>
                   se habilita el boton descargar tabla si primero se genera una
-                </span>
+                </div>
               )}
               <button className="btn btn-success" onClick={handleDownload} disabled={table.length === 0}>
                 Descargar PDF
