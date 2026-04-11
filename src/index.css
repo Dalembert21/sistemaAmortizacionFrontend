@@ -229,18 +229,38 @@ tr:hover td {
 .desktop-sidebar { display: flex !important; }
 .mobile-only { display: none !important; }
 
+@media (max-width: 1024px) {
+  .desktop-sidebar { width: 240px !important; }
+}
+
 @media (max-width: 768px) {
   .layout-wrapper { flex-direction: column !important; }
   .desktop-sidebar { display: none !important; }
-  .mobile-topbar { display: flex !important; }
+  .mobile-topbar { display: flex !important; margin: 0.5rem !important; }
   .mobile-only { display: block !important; }
-  .main-content { padding: 0 1rem 1rem 1rem !important; }
+  .main-content { 
+    padding: 0.5rem !important; 
+    height: auto !important;
+    overflow: visible !important;
+  }
   
-  .glass-panel { padding: 1rem; }
+  .glass-panel { padding: 1rem; overflow-x: hidden; }
   
-  /* Stack grids on mobile */
-  div[style*="grid-template-columns"] {
+  /* Robust Responsive Grids */
+  .grid-responsive {
     grid-template-columns: 1fr !important;
   }
+
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.2rem; }
+
+  .btn { width: 100%; } /* Automate full width buttons on small mobile */
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .glass-panel { padding: 0.75rem; }
+  input, select, .btn { font-size: 16px; } /* Prevent iOS zoom on input focus */
 }
 

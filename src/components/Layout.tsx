@@ -171,18 +171,18 @@ const Layout = () => {
       }}>
         {/* Header */}
 
-        <header className="glass-panel" style={{ padding: '1rem 1.5rem', marginBottom: '1rem', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: '600', color: 'var(--text)' }}>
+        <header className="glass-panel" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ textAlign: 'right', minWidth: '120px' }}>
+              <div style={{ fontWeight: '600', color: 'var(--text)', fontSize: '0.9rem', lineHeight: '1.2' }}>
                 {role === 'SUPERADMIN' ? 'SuperAdmin' : role === 'ADMIN' ? 'Usuario Administrador' : 'Cliente / Público'}
               </div>
-              <div style={{ fontSize: '0.8rem', color: role !== 'GUEST' ? 'var(--primary)' : 'var(--secondary)' }}>
+              <div style={{ fontSize: '0.75rem', color: role !== 'GUEST' ? 'var(--primary)' : 'var(--secondary)' }}>
                 {role !== 'GUEST' ? 'Sesión Autorizada' : 'Modo Abierto'}
               </div>
             </div>
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: role !== 'GUEST' ? 'var(--primary)' : 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {role !== 'GUEST' ? <Settings color="white" size={20} /> : <Lock color="var(--text-muted)" size={20} />}
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: role !== 'GUEST' ? 'var(--primary)' : 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {role !== 'GUEST' ? <Settings color="white" size={18} /> : <Lock color="var(--text-muted)" size={18} />}
             </div>
           </div>
         </header>

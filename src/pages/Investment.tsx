@@ -253,7 +253,7 @@ const Investment = () => {
             <h3>Validación de Identidad Inteligente</h3>
             <p>Para asegurar tu identidad, la IA comparará la foto de tu cédula con tu rostro real.</p>
             
-            <div className="flex justify-center mt-8" style={{ gap: '5rem', alignItems: 'flex-start' }}>
+            <div className="flex justify-center mt-8" style={{ gap: '2rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
                 <div style={{ 
                     width: '160px', height: '160px', 
@@ -326,7 +326,7 @@ const Investment = () => {
             <h3>Identidad Validada. Eliga su destino:</h3>
             <p>Ahora que hemos confirmado su identidad, puede seleccionar la entidad bancaria para su inversión.</p>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginTop: '2rem' }}>
+            <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
               {bancos.map(banco => (
                 <div 
                   key={banco.name} 

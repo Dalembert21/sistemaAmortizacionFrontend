@@ -17,11 +17,11 @@ const Dashboard = () => {
             Tu plataforma integral para simulaciones de crédito e inversiones. 
             Configura, simula o invierte en un solo lugar.
           </p>
-          <div className="flex gap-4">
-            <Link to="/simulator" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
+          <div className="flex gap-4" style={{ flexWrap: 'wrap' }}>
+            <Link to="/simulator" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem', flex: '1 1 200px' }}>
               Simular Crédito <Calculator size={20} />
             </Link>
-            <Link to="/investment" className="btn btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
+            <Link to="/investment" className="btn btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.1rem', flex: '1 1 200px' }}>
               Inversiones <PieChart size={20} />
             </Link>
           </div>
@@ -32,7 +32,7 @@ const Dashboard = () => {
         <div style={{ position: 'absolute', right: '10%', bottom: '-20%', width: '300px', height: '300px', background: 'var(--secondary)', filter: 'blur(100px)', opacity: 0.2, borderRadius: '50%' }}></div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginTop: '1rem' }}>
+      <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginTop: '1rem' }}>
         <div className="glass-panel">
           <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Calculator color="var(--primary-light)" /> Tipos de Crédito</h3>
           <p>Ofrecemos simulación con sistema Francés y Alemán. Cotiza créditos de consumo, hipotecarios, de educación y más.</p>
