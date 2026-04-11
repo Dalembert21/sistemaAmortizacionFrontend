@@ -22,8 +22,8 @@ const Login = () => {
   };
 
   return (
-    <div className="flex" style={{ height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="glass-panel text-center animate-fade-in" style={{ width: '100%', maxWidth: '400px' }}>
+    <div className="flex" style={{ minHeight: '60vh', alignItems: 'center', justifyContent: 'center', padding: '3rem 1rem' }}>
+      <div className="glass-panel text-center animate-fade-in" style={{ width: '100%', maxWidth: '400px', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
           <img
             src="/logo.png"
