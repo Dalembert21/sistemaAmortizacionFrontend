@@ -14,6 +14,7 @@ const AdminConfig = () => {
   const [donationSolca, setDonationSolca] = useState<number | string>(0);
   const [logoBase64, setLogoBase64] = useState<string>('');
   const [showToast, setShowToast] = useState({ show: false, message: '', isReminder: false });
+  const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'credit' | 'investment', index: number } | null>(null);
 
   const triggerToast = (msg: string, isReminder: boolean = false) => {
     setShowToast({ show: true, message: msg, isReminder });
@@ -186,6 +187,39 @@ const AdminConfig = () => {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {deleteConfirm && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            onClick={() => setDeleteConfirm(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              style={{ background: 'var(--surface)', padding: '2rem', borderRadius: 'var(--radius-lg)', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ display: 'inline-flex', padding: '1rem', background: '#fee2e2', borderRadius: '50%', marginBottom: '1rem' }}>
+                <Trash2 size={32} color="var(--danger)" />
+              </div>
+              <h3 style={{ marginBottom: '1rem', color: 'var(--text)', marginTop: 0 }}>¿Seguro que quieres eliminar?</h3>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>Esta acción removerá este {deleteConfirm.type === 'credit' ? 'crédito' : 'tipo de inversión'}. Recuerda "Guardar Cambios" al finalizar.</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button className="btn btn-secondary w-full" onClick={() => setDeleteConfirm(null)}>Cancelar</button>
+                <button className="btn w-full" style={{ background: 'var(--danger)', color: 'white' }} onClick={() => {
+                  if (deleteConfirm.type === 'credit') {
+                    setCredits(credits.filter((_, i) => i !== deleteConfirm.index));
+                  } else {
+                    setInvestments(investments.filter((_, i) => i !== deleteConfirm.index));
+                  }
+                  setDeleteConfirm(null);
+                }}>Sí, eliminar</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
 
 
       <div className="glass-panel">
@@ -266,9 +300,7 @@ const AdminConfig = () => {
                       }}>
                         <CheckCircle size={14} /> Aceptar
                       </button>
-                      <button className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', background: '#fee2e2', color: 'var(--danger)', border: 'none' }} onClick={() => {
-                        setCredits(credits.filter((_, i) => i !== index));
-                      }}>
+                      <button className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', background: '#fee2e2', color: 'var(--danger)', border: 'none' }} onClick={() => setDeleteConfirm({ type: 'credit', index })}>
                         <Trash2 size={14} /> Eliminar
                       </button>
                     </td>
@@ -333,9 +365,7 @@ const AdminConfig = () => {
                       }}>
                         <CheckCircle size={14} /> Aceptar
                       </button>
-                      <button className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', background: '#fee2e2', color: 'var(--danger)', border: 'none' }} onClick={() => {
-                        setInvestments(investments.filter((_, i) => i !== index));
-                      }}>
+                      <button className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', background: '#fee2e2', color: 'var(--danger)', border: 'none' }} onClick={() => setDeleteConfirm({ type: 'investment', index })}>
                         <Trash2 size={14} /> Eliminar
                       </button>
                     </td>

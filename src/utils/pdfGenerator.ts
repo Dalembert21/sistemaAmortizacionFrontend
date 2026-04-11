@@ -6,35 +6,24 @@ export const generatePDF = (table: AmortizationRow[], institutionName: string, c
   const doc = new jsPDF() as any;
   const currentDateTime = new Date().toLocaleString('es-EC', { dateStyle: 'full', timeStyle: 'short' });
 
-  // Si hay logo lo incrustamos a la izquierda superior
-  if (logoBase64) {
-    try {
-      // Elegant Header with Logo
-      doc.setFillColor(255, 255, 255);
-      doc.roundedRect(10, 10, 190, 45, 3, 3, 'F');
-      
-      doc.addImage(logoBase64, 'PNG', 20, 15, 25, 25);
-      
-      doc.setFontSize(26);
-      doc.setTextColor(230, 98, 31);
-      doc.setFont('helvetica', 'bold');
-      doc.text(institutionName.toUpperCase(), 55, 28);
-      
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(100);
-      doc.text("Excelencia en Servicios Financieros", 55, 35);
-      doc.text(`Fecha de Emisión: ${currentDateTime}`, 55, 42);
-    } catch(e) {
-      doc.setFontSize(24);
-      doc.text(institutionName, 20, 25);
-    }
-  } else {
+  // Header
+  try {
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(10, 10, 190, 45, 3, 3, 'F');
+    
     doc.setFontSize(26);
     doc.setTextColor(230, 98, 31);
+    doc.setFont('helvetica', 'bold');
     doc.text(institutionName.toUpperCase(), 20, 25);
+    
     doc.setFontSize(10);
-    doc.text(`Fecha de Emisión: ${currentDateTime}`, 20, 35);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100);
+    doc.text("Excelencia en Servicios Financieros", 20, 32);
+    doc.text(`Fecha de Emisión: ${currentDateTime}`, 20, 38);
+  } catch(e) {
+    doc.setFontSize(24);
+    doc.text(institutionName, 20, 25);
   }
 
   // Elegant Border for the whole page

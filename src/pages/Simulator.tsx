@@ -35,6 +35,11 @@ const Simulator = () => {
     }
   }, [credits, selectedCreditId]);
 
+  React.useEffect(() => {
+    // Si cambian los parámetros financieros, resetear la tabla para obligar a generarla de nuevo
+    setTable([]);
+  }, [amount, months, interest, system, selectedCreditId]);
+
   const [simError, setSimError] = useState('');
 
   const handleSimulate = () => {
@@ -159,9 +164,16 @@ const Simulator = () => {
         <div className="glass-panel" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div className="flex justify-between items-center mb-4">
             <h3>Tabla de Pagos</h3>
-            <button className="btn btn-success" onClick={handleDownload} disabled={table.length === 0}>
-              <Download size={18} /> Descargar PDF
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              {table.length === 0 && (
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  se habilita el boton descargar tabla si primero se genera una
+                </span>
+              )}
+              <button className="btn btn-success" onClick={handleDownload} disabled={table.length === 0}>
+                Descargar PDF
+              </button>
+            </div>
           </div>
 
           {table.length > 0 ? (
