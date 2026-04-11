@@ -6,10 +6,27 @@ import Tesseract from 'tesseract.js';
 import * as faceapi from 'face-api.js';
 
 const Investment = () => {
+  const { config, role } = useAuth();
+  
+  const defaultInvestments = [
+    { id: 1, name: 'Corto Plazo', minAmount: 100, maxAmount: 10000, minTerm: 1, maxTerm: 12 },
+    { id: 2, name: 'Largo Plazo', minAmount: 5000, maxAmount: 100000, minTerm: 12, maxTerm: 120 },
+    { id: 3, name: 'Ahora Flex', minAmount: 50, maxAmount: 50000, minTerm: 1, maxTerm: 60 }
+  ];
+  const investments = (config && config.investments && config.investments.length > 0) ? config.investments : defaultInvestments;
+
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState(5000);
   const [period, setPeriod] = useState(12);
-  const [type, setType] = useState('flex');
+  const [type, setType] = useState<any>(null);
+  const [selectedBank, setSelectedBank] = useState('');
+
+  React.useEffect(() => {
+    if (!type && investments.length > 0) {
+      setType(investments[0].id);
+    }
+  }, [investments, type]);
+
   const [isBiometricValid, setIsBiometricValid] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [isCedulaValid, setIsCedulaValid] = useState(false);
@@ -139,11 +156,19 @@ const Investment = () => {
     }
   };
 
-  const bancos = [
+  const guestBanks = [
+    { name: config?.institutionName || 'Sistema Financiero DB', rate: 'Rendimiento Base', color: 'var(--primary)', url: '#' },
     { name: 'Banco Pichincha', rate: '+0.5%', color: '#ffd100', url: 'https://www.pichincha.com' },
     { name: 'Banco Guayaquil', rate: '+0.2%', color: '#e3006f', url: 'https://www.bancoguayaquil.com' },
     { name: 'Cooperativa JEP', rate: '+1.0%', color: '#005b9f', url: 'https://www.jep.coop' }
   ];
+
+  const bancos = role === 'GUEST' ? guestBanks : [guestBanks[0]];
+
+  const selectedInvestment = investments.find((i: any) => i.id === type) || investments[0];
+  const annualRate = 7.5 + (period >= 12 ? 1.5 : 0) + (amount >= 10000 ? 1 : 0);
+  const interestEarned = amount * (annualRate / 100) * (period / 12);
+  const totalReturn = amount + interestEarned;
 
   return (
     <div className="flex flex-col gap-4 max-w-4xl mx-auto">
@@ -185,15 +210,38 @@ const Investment = () => {
 
             <div className="mt-4">
               <label>Tipo de Inversión</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-                <button className={`btn ${type === 'corto' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setType('corto')}>Corto Plazo</button>
-                <button className={`btn ${type === 'largo' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setType('largo')}>Largo Plazo</button>
-                <button className={`btn ${type === 'flex' ? 'btn-success' : 'btn-secondary'}`} onClick={() => setType('flex')}>Ahora Flex</button>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
+                {investments.map((inv: any) => (
+                  <button 
+                    key={inv.id}
+                    className={`btn ${type === inv.id ? 'btn-primary' : 'btn-secondary'}`} 
+                    onClick={() => setType(inv.id)}
+                  >
+                    {inv.name}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Rendimiento section removed as requested */}
-
+            <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+              <h4 style={{ margin: 0, color: '#059669', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                 Proyección de Rendimiento
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                <div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Tasa Efectiva Anual</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--text)' }}>{annualRate.toFixed(2)}%</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Interés Ganado</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#10b981' }}>+ ${interestEarned.toFixed(2)}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Total a Recibir</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary)' }}>${totalReturn.toFixed(2)}</div>
+                </div>
+              </div>
+            </div>
 
             <button className="btn btn-primary w-full mt-10" onClick={() => setStep(2)}>
               Continuar a Validación de Identidad
@@ -292,7 +340,7 @@ const Investment = () => {
                   </div>
                   
                   <div className="flex flex-col gap-2 mt-4">
-                    <button className="btn btn-primary w-full" style={{ padding: '0.5rem' }} onClick={() => setStep(4)}>
+                    <button className="btn btn-primary w-full" style={{ padding: '0.5rem' }} onClick={() => { setSelectedBank(banco.name); setStep(4); }}>
                       Invertir Aquí
                     </button>
                     <a 
@@ -319,9 +367,9 @@ const Investment = () => {
                <CheckCircle size={80} color="var(--secondary)" />
              </div>
              <h2>¡Inversión Procesada con Éxito!</h2>
-             <p>Su dinero ha sido transferido a la entidad seleccionada de forma segura.</p>
+             <p>Acabas de escoger efectuar la inversión con <strong>{selectedBank}</strong>... ¡fue tu mejor elección!</p>
              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Identidad validada al 99.8% vía Reconocimiento Facial.</p>
-             <button className="btn btn-primary mt-6" onClick={() => { resetValidation(); setStep(1); }}>Finalizar y Salir</button>
+             <button className="btn btn-primary mt-6" onClick={() => { resetValidation(); setStep(1); setSelectedBank(''); }}>Finalizar y Salir</button>
           </motion.div>
         )}
       </AnimatePresence>

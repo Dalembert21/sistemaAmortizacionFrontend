@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 type Role = 'GUEST' | 'ADMIN' | 'SUPERADMIN';
 
@@ -22,9 +22,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const savedConfig = localStorage.getItem('auth_config');
     return savedConfig ? JSON.parse(savedConfig) : {
       institutionName: 'Sistema Financiero DB',
-      primaryColor: '#E6621F',
       logoBase64: '',
-      credits: []
+      credits: [],
+      investments: []
     };
   });
 
@@ -53,6 +53,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       fetchConfig();
     }
   }, []);
+
+  useEffect(() => {
+    if (config?.institutionName) {
+      document.title = config.institutionName;
+    } else {
+      document.title = 'Sistema Financiero DB';
+    }
+
+    if (config?.logoBase64) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
+      link.href = config.logoBase64;
+    } else {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (link) {
+        link.href = '/db.svg';
+      }
+    }
+  }, [config]);
 
   const login = async (user: string, pass: string) => {
     try {

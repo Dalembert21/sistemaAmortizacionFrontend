@@ -7,11 +7,11 @@ const AdminConfig = () => {
   const { config, updateConfig } = useAuth();
 
   const [institutionName, setInstitutionName] = useState('');
-  const [showBanner, setShowBanner] = useState(false);
+
   const [credits, setCredits] = useState<any[]>([]);
+  const [investments, setInvestments] = useState<any[]>([]);
   const [insuranceRate, setInsuranceRate] = useState<number | string>(0);
   const [donationSolca, setDonationSolca] = useState<number | string>(0);
-  const [primaryColor, setPrimaryColor] = useState('#E6621F');
   const [logoBase64, setLogoBase64] = useState<string>('');
   const [showToast, setShowToast] = useState({ show: false, message: '', isReminder: false });
 
@@ -26,37 +26,46 @@ const AdminConfig = () => {
     { id: 3, name: 'Crédito Educativo', minRate: 7, maxRate: 9, minAmount: 1000, maxAmount: 30000 }
   ];
 
+  const defaultInvestments = [
+    { id: 1, name: 'Corto Plazo', minAmount: 100, maxAmount: 10000, minTerm: 1, maxTerm: 12 },
+    { id: 2, name: 'Largo Plazo', minAmount: 5000, maxAmount: 100000, minTerm: 12, maxTerm: 120 },
+    { id: 3, name: 'Ahora Flex', minAmount: 50, maxAmount: 50000, minTerm: 1, maxTerm: 60 }
+  ];
+
   useEffect(() => {
     if (config) {
       setInstitutionName(config.institutionName || 'Sistema Financiero DB');
       setCredits(config.credits && config.credits.length > 0 ? config.credits : defaultCredits);
+      setInvestments(config.investments && config.investments.length > 0 ? config.investments : defaultInvestments);
       setInsuranceRate(config.insuranceRate || 0);
       setDonationSolca(config.donationSolca || 0);
       setLogoBase64(config.logoBase64 || '');
-      setPrimaryColor(config.primaryColor || '#E6621F');
     }
   }, [config]);
   const hasChanges = () => {
     if (!config) return false;
     const configCredits = (config.credits && config.credits.length > 0) ? config.credits : defaultCredits;
+    const configInvestments = (config.investments && config.investments.length > 0) ? config.investments : defaultInvestments;
 
     // Normalización para comparación profunda
     const normalize = (arr: any[]) => JSON.stringify(arr.map(c => ({
       name: String(c.name).trim(),
-      minRate: Number(c.minRate),
-      maxRate: Number(c.maxRate),
+      minRate: c.minRate !== undefined ? Number(c.minRate) : undefined,
+      maxRate: c.maxRate !== undefined ? Number(c.maxRate) : undefined,
       minAmount: Number(c.minAmount),
-      maxAmount: Number(c.maxAmount)
+      maxAmount: Number(c.maxAmount),
+      minTerm: c.minTerm !== undefined ? Number(c.minTerm) : undefined,
+      maxTerm: c.maxTerm !== undefined ? Number(c.maxTerm) : undefined
     })));
 
     const isNameDiff = institutionName !== (config.institutionName || 'Sistema Financiero DB');
     const isLogoDiff = logoBase64 !== (config.logoBase64 || '');
-    const isColorDiff = primaryColor.toLowerCase() !== (config.primaryColor || '#E6621F').toLowerCase();
     const isInsDiff = Number(insuranceRate) !== Number(config.insuranceRate || 0);
     const isDonDiff = Number(donationSolca) !== Number(config.donationSolca || 0);
     const isCreditsDiff = normalize(credits) !== normalize(configCredits);
+    const isInvestsDiff = normalize(investments) !== normalize(configInvestments);
 
-    return isNameDiff || isLogoDiff || isColorDiff || isInsDiff || isDonDiff || isCreditsDiff;
+    return isNameDiff || isLogoDiff || isInsDiff || isDonDiff || isCreditsDiff || isInvestsDiff;
   };
 
   const LEGAL_LIMITS: Record<string, { max: number }> = {
@@ -91,8 +100,8 @@ const AdminConfig = () => {
     await updateConfig({
        institutionName,
        logoBase64,
-       primaryColor,
        credits,
+       investments,
        insuranceRate: Number(insuranceRate),
        donationSolca: Number(donationSolca)
     });
@@ -199,18 +208,6 @@ const AdminConfig = () => {
               <input type="file" accept="image/*" style={{ padding: '0.5rem' }} onChange={handleLogoUpload} />
             </div>
           </div>
-          <div>
-            <label>Color Principal de la Plataforma</label>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              <input
-                type="color"
-                value={primaryColor}
-                onChange={(e) => setPrimaryColor(e.target.value)}
-                style={{ width: '60px', height: '40px', padding: '2px', cursor: 'pointer' }}
-              />
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{primaryColor}</span>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -271,6 +268,73 @@ const AdminConfig = () => {
                       </button>
                       <button className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', background: '#fee2e2', color: 'var(--danger)', border: 'none' }} onClick={() => {
                         setCredits(credits.filter((_, i) => i !== index));
+                      }}>
+                        <Trash2 size={14} /> Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="glass-panel">
+        <div className="flex justify-between items-center mb-4">
+          <h3 style={{ margin: 0 }}>Configuración de Tipos de Inversión</h3>
+          <button className="btn btn-secondary" onClick={() => {
+            const nextId = investments.length > 0 ? Math.max(...investments.map(c => c.id || 0)) + 1 : 1;
+            setInvestments([...investments, { id: nextId, name: 'Nueva Inversión', minAmount: 100, maxAmount: 10000, minTerm: 1, maxTerm: 12 }]);
+          }}>
+            + Agregar Tipo
+          </button>
+        </div>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style={{ minWidth: '250px' }}>Tipo de Inversión</th>
+                <th>Monto Min ($)</th>
+                <th>Monto Max ($)</th>
+                <th>Plazo Min (Meses)</th>
+                <th>Plazo Max (Meses)</th>
+                <th style={{ minWidth: '200px' }}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {investments.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                    No hay tipos de inversión configurados. Haga clic en "+ Agregar Tipo" para comenzar.
+                  </td>
+                </tr>
+              ) : (
+                investments.map((inv, index) => (
+                  <tr key={inv.id}>
+                    <td><input type="text" style={{ minWidth: '230px' }} value={inv.name} onChange={(e) => {
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, name: e.target.value } : c));
+                    }} /></td>
+                    <td><input type="number" value={inv.minAmount} onChange={(e) => {
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minAmount: e.target.value } : c));
+                    }} /></td>
+                    <td><input type="number" value={inv.maxAmount} onChange={(e) => {
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxAmount: e.target.value } : c));
+                    }} /></td>
+                    <td><input type="number" value={inv.minTerm} onChange={(e) => {
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minTerm: e.target.value } : c));
+                    }} /></td>
+                    <td><input type="number" value={inv.maxTerm} onChange={(e) => {
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxTerm: e.target.value } : c));
+                    }} /></td>
+                    <td style={{ display: 'flex', gap: '0.4rem' }}>
+                      <button className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', background: '#d1fae5', color: '#059669', border: 'none' }} onClick={() => {
+                        triggerToast(`Fila "${inv.name}" validada correctamente.`, true);
+                      }}>
+                        <CheckCircle size={14} /> Aceptar
+                      </button>
+                      <button className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', background: '#fee2e2', color: 'var(--danger)', border: 'none' }} onClick={() => {
+                        setInvestments(investments.filter((_, i) => i !== index));
                       }}>
                         <Trash2 size={14} /> Eliminar
                       </button>

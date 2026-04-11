@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
@@ -49,31 +49,6 @@ function AppRoutes() {
 }
 
 function AppContent() {
-  const { config } = useAuth();
-
-  React.useEffect(() => {
-    if (config?.primaryColor) {
-      document.documentElement.style.setProperty('--primary', config.primaryColor);
-
-      const hexToRgb = (hex: string) => {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16)
-        } : null;
-      };
-
-      const rgb = hexToRgb(config.primaryColor);
-      if (rgb) {
-        document.documentElement.style.setProperty('--primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
-        // Also update primary-dark and primary-light roughly
-        document.documentElement.style.setProperty('--primary-dark', `rgb(${Math.max(0, rgb.r - 30)}, ${Math.max(0, rgb.g - 30)}, ${Math.max(0, rgb.b - 30)})`);
-        document.documentElement.style.setProperty('--primary-light', `rgb(${Math.min(255, rgb.r + 30)}, ${Math.min(255, rgb.g + 30)}, ${Math.min(255, rgb.b + 30)})`);
-      }
-    }
-  }, [config]);
-
   return (
     <BrowserRouter>
       <AppRoutes />
