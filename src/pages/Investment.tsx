@@ -165,7 +165,6 @@ const Investment = () => {
 
   const bancos = role === 'GUEST' ? guestBanks : [guestBanks[0]];
 
-  const selectedInvestment = investments.find((i: any) => i.id === type) || investments[0];
   const annualRate = 7.5 + (period >= 12 ? 1.5 : 0) + (amount >= 10000 ? 1 : 0);
   const interestEarned = amount * (annualRate / 100) * (period / 12);
   const totalReturn = amount + interestEarned;

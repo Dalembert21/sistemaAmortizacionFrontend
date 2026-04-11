@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import type { AmortizationRow } from '../utils/amortization';
 import { calculateAmortization } from '../utils/amortization';
 import { generatePDF } from '../utils/pdfGenerator';
-import { Download, Calculator } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Simulator = () => {

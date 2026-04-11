@@ -1,5 +1,3 @@
-import React from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calculator, PieChart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';

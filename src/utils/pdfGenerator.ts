@@ -57,7 +57,7 @@ export const generatePDF = (table: AmortizationRow[], institutionName: string, c
 
   // Table Data mapping
   const tableColumn = ["Mes", "Saldo Inicial", "Capital", "Interés", "Otros (Seguros)", "Cuota Total", "Saldo Final"];
-  const tableRows = [];
+  const tableRows: any[][] = [];
 
   table.forEach(row => {
     const rowData = [

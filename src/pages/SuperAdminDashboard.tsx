@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Building, PlusCircle } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 const SuperAdminDashboard = () => {
   const [orgs, setOrgs] = useState<any[]>([]);
