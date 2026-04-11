@@ -7,7 +7,7 @@ import { Download, Calculator } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Simulator = () => {
-  const { config } = useAuth();
+  const { config, role, orgId } = useAuth();
 
   const [selectedCreditId, setSelectedCreditId] = useState<number | null>(null);
   const [amount, setAmount] = useState(5000);
@@ -39,6 +39,16 @@ const Simulator = () => {
     // Si cambian los parámetros financieros, resetear la tabla para obligar a generarla de nuevo
     setTable([]);
   }, [amount, months, interest, system, selectedCreditId]);
+
+  React.useEffect(() => {
+    // Seguridad de Sesión: Limpiar formulario totalmente al cambiar de usuario/cerrar sesión
+    setTable([]);
+    setClientName('Consumidor Final');
+    setAmount(credits.length > 0 ? credits[0].minAmount : 5000);
+    setMonths(12);
+    setInterest(credits.length > 0 ? credits[0].minRate : 10);
+    setSimError('');
+  }, [role, orgId]);
 
   const [simError, setSimError] = useState('');
 
