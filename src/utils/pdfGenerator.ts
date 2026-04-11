@@ -9,31 +9,38 @@ export const generatePDF = (table: AmortizationRow[], institutionName: string, c
   // Si hay logo lo incrustamos a la izquierda superior
   if (logoBase64) {
     try {
-      doc.addImage(logoBase64, 'PNG', 14, 10, 30, 30, undefined, 'FAST');
+      // Elegant Header with Logo
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(10, 10, 190, 45, 3, 3, 'F');
       
-      doc.setFontSize(24);
-      doc.setTextColor(230, 98, 31); // Primary color (Naranja)
-      doc.text(institutionName, 50, 25);
+      doc.addImage(logoBase64, 'PNG', 20, 15, 25, 25);
+      
+      doc.setFontSize(26);
+      doc.setTextColor(230, 98, 31);
+      doc.setFont('helvetica', 'bold');
+      doc.text(institutionName.toUpperCase(), 55, 28);
       
       doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
       doc.setTextColor(100);
-      doc.text(`Generado: ${currentDateTime}`, 50, 32);
+      doc.text("Excelencia en Servicios Financieros", 55, 35);
+      doc.text(`Fecha de Emisión: ${currentDateTime}`, 55, 42);
     } catch(e) {
       doc.setFontSize(24);
-      doc.setTextColor(230, 98, 31);
-      doc.text(institutionName, 14, 25);
-      doc.setFontSize(10);
-      doc.text(`Generado: ${currentDateTime}`, 14, 32);
+      doc.text(institutionName, 20, 25);
     }
   } else {
-    // Sin Logo
-    doc.setFontSize(24);
+    doc.setFontSize(26);
     doc.setTextColor(230, 98, 31);
-    doc.text(institutionName, 14, 25);
+    doc.text(institutionName.toUpperCase(), 20, 25);
     doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Generado: ${currentDateTime}`, 14, 32);
+    doc.text(`Fecha de Emisión: ${currentDateTime}`, 20, 35);
   }
+
+  // Elegant Border for the whole page
+  doc.setDrawColor(230, 98, 31);
+  doc.setLineWidth(0.7);
+  doc.rect(5, 5, 200, 287);
 
   // Separator Line
   doc.setDrawColor(230, 98, 31);
@@ -55,6 +62,9 @@ export const generatePDF = (table: AmortizationRow[], institutionName: string, c
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(80);
   doc.text(`Sistema de Amortización: ${systemName}`, 14, 62);
+
+  const logoToUse = logoBase64 || '/logo.png';
+
 
   // Table Data mapping
   const tableColumn = ["Mes", "Saldo Inicial", "Capital", "Interés", "Otros (Seguros)", "Cuota Total", "Saldo Final"];
@@ -80,8 +90,22 @@ export const generatePDF = (table: AmortizationRow[], institutionName: string, c
     theme: 'grid',
     styles: { fontSize: 8, font: 'helvetica', cellPadding: 2 },
     headStyles: { fillColor: [230, 98, 31], textColor: 255, fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [255, 245, 235] } // Tono naranja suave
+    alternateRowStyles: { fillColor: [255, 248, 240] } // Tono naranja extremadamente suave
   });
+
+  // --- Watermark (Marca de Agua) SOBRE la tabla ---
+  if (logoToUse) {
+    try {
+      if ((doc as any).GState) {
+        doc.saveGraphicsState();
+        doc.setGState(new (doc as any).GState({ opacity: 0.25 })); // Visibilidad clara pero transparente
+        doc.addImage(logoToUse, 'PNG', 55, 100, 100, 100, undefined, 'FAST');
+        doc.restoreGraphicsState();
+      } else {
+        doc.addImage(logoToUse, 'PNG', 55, 100, 100, 100, undefined, 'FAST');
+      }
+    } catch (e) {}
+  }
 
   doc.save(`Tabla_Amortizacion_${clientName}.pdf`);
 };

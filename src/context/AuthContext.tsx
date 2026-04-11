@@ -18,11 +18,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<Role>('GUEST');
   const [orgId, setOrgId] = useState<string>('11111111-1111-1111-1111-111111111111'); // Organización por defecto para clientes
-  const [config, setConfig] = useState<any>({
-    institutionName: 'Sistema Financiero DB',
-    primaryColor: '#E6621F',
-    logoBase64: '',
-    credits: []
+  const [config, setConfig] = useState<any>(() => {
+    const savedConfig = localStorage.getItem('auth_config');
+    return savedConfig ? JSON.parse(savedConfig) : {
+      institutionName: 'Sistema Financiero DB',
+      primaryColor: '#E6621F',
+      logoBase64: '',
+      credits: []
+    };
   });
 
   const fetchConfig = async (forcedOrgId?: string) => {
@@ -32,6 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (res.ok) {
         const data = await res.json();
         setConfig(data);
+        localStorage.setItem('auth_config', JSON.stringify(data));
       }
     } catch (e) {
       console.warn("Backend not running or org missing");
@@ -39,7 +43,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    fetchConfig();
+    const savedRole = localStorage.getItem('auth_role') as Role;
+    const savedOrgId = localStorage.getItem('auth_orgId');
+    if (savedRole && savedOrgId) {
+      setRole(savedRole);
+      setOrgId(savedOrgId);
+      fetchConfig(savedOrgId);
+    } else {
+      fetchConfig();
+    }
   }, []);
 
   const login = async (user: string, pass: string) => {
@@ -54,6 +66,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setRole(data.role);
         if (data.orgId) {
           setOrgId(data.orgId);
+          localStorage.setItem('auth_role', data.role);
+          localStorage.setItem('auth_orgId', data.orgId);
           fetchConfig(data.orgId);
         }
         return true;
@@ -67,20 +81,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateConfig = async (newConfig: any) => {
     if (role !== 'ADMIN') return;
     try {
-      await fetch(`http://localhost:3000/api/config/${orgId}`, {
+      const res = await fetch(`http://localhost:3000/api/config/${orgId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newConfig)
       });
-      await fetchConfig();
+      if (res.ok) {
+        setConfig(newConfig); // Actualización inmediata local
+        localStorage.setItem('auth_config', JSON.stringify(newConfig));
+      }
     } catch(e) {
+      console.error("Error al actualizar config:", e);
       setConfig(newConfig);
+      localStorage.setItem('auth_config', JSON.stringify(newConfig));
     }
   };
 
   const logout = () => {
     setRole('GUEST');
     setOrgId('11111111-1111-1111-1111-111111111111');
+    localStorage.removeItem('auth_role');
+    localStorage.removeItem('auth_orgId');
+    localStorage.removeItem('auth_config');
     fetchConfig('11111111-1111-1111-1111-111111111111');
   };
 

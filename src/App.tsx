@@ -27,21 +27,21 @@ function AppRoutes() {
         <Route path="simulator" element={<Simulator />} />
         <Route path="investment" element={<Investment />} />
         <Route path="login" element={<Login />} />
-        <Route 
-          path="admin" 
+        <Route
+          path="admin"
           element={
             <ProtectedRoute requiredRole="ADMIN">
               <AdminConfig />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="superadmin" 
+        <Route
+          path="superadmin"
           element={
             <ProtectedRoute requiredRole="SUPERADMIN">
               <SuperAdminDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
       </Route>
     </Routes>
@@ -54,7 +54,7 @@ function AppContent() {
   React.useEffect(() => {
     if (config?.primaryColor) {
       document.documentElement.style.setProperty('--primary', config.primaryColor);
-      
+
       const hexToRgb = (hex: string) => {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
@@ -63,7 +63,7 @@ function AppContent() {
           b: parseInt(result[3], 16)
         } : null;
       };
-      
+
       const rgb = hexToRgb(config.primaryColor);
       if (rgb) {
         document.documentElement.style.setProperty('--primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);

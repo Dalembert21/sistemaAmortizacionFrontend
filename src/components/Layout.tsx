@@ -8,6 +8,13 @@ const Layout = () => {
   const location = useLocation();
   const { role, logout, config } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(false);
+
+  React.useEffect(() => {
+    setIsPageLoading(true);
+    const timer = setTimeout(() => setIsPageLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   // Logo Dinámico según config
   const logoSrc = config?.logoBase64 || '/logo.png';
@@ -17,10 +24,10 @@ const Layout = () => {
     { path: '/dashboard', label: 'Inicio', icon: <LayoutDashboard size={20} /> },
     { path: '/simulator', label: 'Simulador Crédito', icon: <Calculator size={20} /> },
     { path: '/investment', label: 'Inversiones', icon: <PieChart size={20} /> },
-    { 
-      path: role === 'ADMIN' ? '/admin' : '/login', 
-      label: 'Configuración Institución', 
-      icon: role === 'ADMIN' ? <Settings size={20} /> : <Lock size={20} /> 
+    {
+      path: role === 'ADMIN' ? '/admin' : '/login',
+      label: 'Configuración Institución',
+      icon: role === 'ADMIN' ? <Settings size={20} /> : <Lock size={20} />
     },
     ...(role === 'SUPERADMIN' ? [{ path: '/superadmin', label: 'Gestión SuperAdmin', icon: <FileCode size={20} /> }] : [])
   ];
@@ -51,8 +58,8 @@ const Layout = () => {
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, marginTop: '1rem', width: '100%' }}>
         {menuItems.map((item) => (
-          <Link 
-            key={item.label} 
+          <Link
+            key={item.label}
             to={item.path}
             onClick={() => setIsMobileMenuOpen(false)}
             style={{
@@ -89,17 +96,35 @@ const Layout = () => {
       </nav>
 
       {role !== 'GUEST' && (
-         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', width: '100%' }}>
-           <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="btn w-full hover:bg-surface-light" style={{ background: 'transparent', color: 'var(--danger)', display: 'flex', justifyContent: 'flex-start', padding: '0.75rem 1rem' }}>
-              <LogOut size={20} /> Cerrar Sesión
-           </button>
-         </div>
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', width: '100%' }}>
+          <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="btn w-full hover:bg-surface-light" style={{ background: 'transparent', color: 'var(--danger)', display: 'flex', justifyContent: 'flex-start', padding: '0.75rem 1rem' }}>
+            <LogOut size={20} /> Cerrar Sesión
+          </button>
+        </div>
       )}
     </>
   );
 
   return (
     <div className="layout-wrapper" style={{ minHeight: '100vh', background: 'var(--background)' }}>
+      <AnimatePresence>
+        {isPageLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+               <div className="loading-spinner" style={{ width: '50px', height: '50px', border: '5px solid #f3f3f3', borderTop: '5px solid var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+               <span style={{ fontWeight: '700', color: 'var(--primary)', letterSpacing: '1px' }}>{institutionName.toUpperCase()}</span>
+            </div>
+            <style>{`
+              @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            `}</style>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Mobile Topbar */}
       <div className="mobile-topbar glass-panel" style={{ display: 'none', justifyContent: 'space-between', alignItems: 'center', margin: '1rem', padding: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -119,38 +144,45 @@ const Layout = () => {
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 40 }}
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <motion.aside 
+            <motion.aside
               initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
               onClick={e => e.stopPropagation()}
-              className="glass-panel" 
+              className="glass-panel"
               style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: '80%', maxWidth: '300px', display: 'flex', flexDirection: 'column', borderRadius: 0, zIndex: 50 }}
             >
-               <SidebarContent />
+              <SidebarContent />
             </motion.aside>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
-      <main className="main-content" style={{ flex: 1, padding: '1rem 2rem 1rem 0', display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+      <main className="main-content" style={{ 
+        flex: 1, 
+        padding: '1rem 2rem 1rem 0', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        height: '100vh', 
+        overflow: location.pathname === '/login' ? 'hidden' : 'auto' 
+      }}>
         {/* Header */}
+
         <header className="glass-panel" style={{ padding: '1rem 1.5rem', marginBottom: '1rem', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontWeight: '600', color: 'var(--text)' }}>
-                 {role === 'SUPERADMIN' ? 'SuperAdmin' : role === 'ADMIN' ? 'Usuario Administrador' : 'Cliente / Público'}
+                {role === 'SUPERADMIN' ? 'SuperAdmin' : role === 'ADMIN' ? 'Usuario Administrador' : 'Cliente / Público'}
               </div>
               <div style={{ fontSize: '0.8rem', color: role !== 'GUEST' ? 'var(--primary)' : 'var(--secondary)' }}>
-                 {role !== 'GUEST' ? 'Sesión Autorizada' : 'Modo Abierto'}
+                {role !== 'GUEST' ? 'Sesión Autorizada' : 'Modo Abierto'}
               </div>
             </div>
             <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: role !== 'GUEST' ? 'var(--primary)' : 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-               {role !== 'GUEST' ? <Settings color="white" size={20} /> : <Lock color="var(--text-muted)" size={20} />}
+              {role !== 'GUEST' ? <Settings color="white" size={20} /> : <Lock color="var(--text-muted)" size={20} />}
             </div>
           </div>
         </header>

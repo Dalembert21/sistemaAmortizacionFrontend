@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Upload, CheckCircle, Building } from 'lucide-react';
+import { Camera, Upload, CheckCircle, Building, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Tesseract from 'tesseract.js';
 import * as faceapi from 'face-api.js';
@@ -157,11 +157,15 @@ const Investment = () => {
         <div style={{ flex: 1, height: '2px', background: 'var(--border)', margin: '0 1rem' }}>
           <div style={{ height: '100%', background: 'var(--secondary)', width: step >= 2 ? '100%' : '0%', transition: 'var(--transition)' }}></div>
         </div>
-        <div style={{ color: step >= 2 ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: step >= 2 ? '600' : '400' }}>2. Validación</div>
+        <div style={{ color: step >= 2 ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: step >= 2 ? '600' : '400' }}>2. Validación Identidad</div>
         <div style={{ flex: 1, height: '2px', background: 'var(--border)', margin: '0 1rem' }}>
           <div style={{ height: '100%', background: 'var(--secondary)', width: step >= 3 ? '100%' : '0%', transition: 'var(--transition)' }}></div>
         </div>
-        <div style={{ color: step >= 3 ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: step >= 3 ? '600' : '400' }}>3. Confirmación</div>
+        <div style={{ color: step >= 3 ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: step >= 3 ? '600' : '400' }}>3. Selección Banco</div>
+        <div style={{ flex: 1, height: '2px', background: 'var(--border)', margin: '0 1rem' }}>
+          <div style={{ height: '100%', background: 'var(--secondary)', width: step >= 4 ? '100%' : '0%', transition: 'var(--transition)' }}></div>
+        </div>
+        <div style={{ color: step >= 4 ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: step >= 4 ? '600' : '400' }}>4. Éxito</div>
       </div>
 
       <AnimatePresence mode="wait">
@@ -191,34 +195,15 @@ const Investment = () => {
             {/* Rendimiento section removed as requested */}
 
 
-            {useAuth().role === 'GUEST' && (
-              <div className="mt-6">
-                <h3>Elige una entidad bancaria</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginTop: '1rem' }}>
-                  {bancos.map(banco => (
-                    <div 
-                      key={banco.name} 
-                      onClick={() => window.open(banco.url, '_blank')}
-                      style={{ border: '1px solid var(--border)', padding: '1rem', borderRadius: 'var(--radius-md)', cursor: 'pointer', transition: 'var(--transition)' }} 
-                      className="hover:bg-surface"
-                    >
-                      <h4 style={{ color: banco.color }}>{banco.name}</h4>
-                      <span style={{ color: 'var(--secondary)' }}>Beneficio: {banco.rate}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <button className="btn btn-primary w-full mt-16" onClick={() => setStep(2)}>
-              Continuar
+            <button className="btn btn-primary w-full mt-10" onClick={() => setStep(2)}>
+              Continuar a Validación de Identidad
             </button>
           </motion.div>
         )}
 
         {step === 2 && (
           <motion.div key="step2" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="glass-panel text-center">
-            <h3>Validación Biométrica Inteligente (KYC)</h3>
+            <h3>Validación de Identidad Inteligente</h3>
             <p>Para asegurar tu identidad, la IA comparará la foto de tu cédula con tu rostro real.</p>
             
             <div className="flex justify-center gap-8 mt-6">
@@ -282,20 +267,61 @@ const Investment = () => {
             <div className="flex gap-4 mt-8">
               <button className="btn btn-secondary w-full" onClick={() => { resetValidation(); setStep(1); }}>Atrás</button>
               <button className="btn btn-primary w-full" disabled={!isBiometricValid || !isCedulaValid} onClick={() => setStep(3)}>
-                Confirmar e Invertir
+                Continuar a Selección
               </button>
             </div>
           </motion.div>
         )}
 
         {step === 3 && (
-          <motion.div key="step3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel text-center">
+          <motion.div key="step3" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="glass-panel text-center">
+            <CheckCircle size={50} color="var(--secondary)" style={{ margin: '0 auto 1rem' }} />
+            <h3>Identidad Validada. Eliga su destino:</h3>
+            <p>Ahora que hemos confirmado su identidad, puede seleccionar la entidad bancaria para su inversión.</p>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginTop: '2rem' }}>
+              {bancos.map(banco => (
+                <div 
+                  key={banco.name} 
+                  style={{ border: '1px solid var(--border)', padding: '1.5rem 1rem', borderRadius: 'var(--radius-lg)', transition: 'var(--transition)', background: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }} 
+                  className="hover:scale-105"
+                >
+                  <h4 style={{ color: banco.color, marginBottom: '0.2rem' }}>{banco.name}</h4>
+                  <div style={{ background: 'rgba(var(--primary-rgb), 0.1)', padding: '0.5rem', borderRadius: 'var(--radius-sm)', color: 'var(--primary)', fontWeight: '700', fontSize: '0.9rem' }}>
+                    Tasa: {banco.rate}
+                  </div>
+                  
+                  <div className="flex flex-col gap-2 mt-4">
+                    <button className="btn btn-primary w-full" style={{ padding: '0.5rem' }} onClick={() => setStep(4)}>
+                      Invertir Aquí
+                    </button>
+                    <a 
+                      href={banco.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="btn btn-secondary w-full" 
+                      style={{ padding: '0.5rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                    >
+                      Más Información <ExternalLink size={14} />
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button className="btn btn-secondary mt-8" onClick={() => setStep(2)}>Volver a Validación</button>
+          </motion.div>
+        )}
+
+        {step === 4 && (
+          <motion.div key="step4" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel text-center">
              <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
                <CheckCircle size={80} color="var(--secondary)" />
              </div>
              <h2>¡Inversión Procesada con Éxito!</h2>
-             <p>Identidad validada al 99.8% vía IA. Certificado generado.</p>
-             <button className="btn btn-primary mt-6" onClick={() => { resetValidation(); setStep(1); }}>Volver al Inicio</button>
+             <p>Su dinero ha sido transferido a la entidad seleccionada de forma segura.</p>
+             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Identidad validada al 99.8% vía Reconocimiento Facial.</p>
+             <button className="btn btn-primary mt-6" onClick={() => { resetValidation(); setStep(1); }}>Finalizar y Salir</button>
           </motion.div>
         )}
       </AnimatePresence>

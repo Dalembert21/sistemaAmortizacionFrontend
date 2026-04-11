@@ -35,10 +35,25 @@ const Simulator = () => {
     }
   }, [credits, selectedCreditId]);
 
+  const [simError, setSimError] = useState('');
+
   const handleSimulate = () => {
-    const indirectCosts = { 
-       insurancePercentage: config?.insuranceRate || 0, 
-       fixedCosts: config?.donationSolca || 0 
+    setSimError('');
+    
+    // Validaciones de límites configurados
+    if (amount < activeCreditType.minAmount || amount > activeCreditType.maxAmount) {
+      setSimError(`El monto debe estar entre $${activeCreditType.minAmount} y $${activeCreditType.maxAmount}`);
+      return;
+    }
+
+    if (interest < activeCreditType.minRate || interest > activeCreditType.maxRate) {
+      setSimError(`La tasa de interés debe estar entre ${activeCreditType.minRate}% y ${activeCreditType.maxRate}%`);
+      return;
+    }
+
+    const indirectCosts = {
+      insurancePercentage: config?.insuranceRate || 0,
+      fixedCosts: config?.donationSolca || 0
     };
 
     const result = calculateAmortization({
@@ -54,7 +69,7 @@ const Simulator = () => {
   const handleDownload = () => {
     if (table.length > 0) {
       const systemName = system === 'FRENCH' ? 'Francés (Cuota Fija)' : 'Alemán (Cuota Decreciente)';
-      const instName = config?.institutionName || 'Financiera Financo';
+      const instName = config?.institutionName || 'Sistema Financiero DB';
       const logoBase64 = config?.logoBase64 || null;
       generatePDF(table, instName, clientName, systemName, logoBase64);
     }
@@ -69,7 +84,7 @@ const Simulator = () => {
       <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '1.5rem' }}>
         <div className="glass-panel h-fit">
           <h3 className="mb-4">Parámetros</h3>
-          
+
           <div className="mb-4">
             <label>Tipo de Crédito</label>
             <select value={selectedCreditId || ''} onChange={(e) => {
@@ -94,8 +109,14 @@ const Simulator = () => {
 
           <div className="mb-4">
             <label>Monto a Solicitar ($)</label>
-            <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} />
-            <small style={{ color: 'var(--text-muted)' }}>Sugerido: {activeCreditType?.minAmount} - {activeCreditType?.maxAmount}</small>
+            <input 
+              type="number" 
+              value={amount} 
+              onChange={(e) => setAmount(Number(e.target.value))} 
+              min={activeCreditType?.minAmount}
+              max={activeCreditType?.maxAmount}
+            />
+            <small style={{ color: 'var(--text-muted)' }}>Sugerido: ${activeCreditType?.minAmount} - ${activeCreditType?.maxAmount}</small>
           </div>
 
           <div className="mb-4">
@@ -105,7 +126,14 @@ const Simulator = () => {
 
           <div className="mb-4">
             <label>Tasa de Interés Anual (%)</label>
-            <input type="number" step="0.1" value={interest} onChange={(e) => setInterest(Number(e.target.value))} />
+            <input 
+              type="number" 
+              step="0.1" 
+              value={interest} 
+              onChange={(e) => setInterest(Number(e.target.value))} 
+              min={activeCreditType?.minRate}
+              max={activeCreditType?.maxRate}
+            />
             <small style={{ color: 'var(--text-muted)' }}>Sugerido: {activeCreditType?.minRate}% - {activeCreditType?.maxRate}%</small>
           </div>
 
@@ -116,6 +144,12 @@ const Simulator = () => {
               <option value="GERMAN">Sistema Alemán (Cuota Decreciente)</option>
             </select>
           </div>
+
+          {simError && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: '500' }}>
+              ⚠️ {simError}
+            </motion.div>
+          )}
 
           <button className="btn btn-primary w-full mt-4" onClick={handleSimulate}>
             Generar Tabla

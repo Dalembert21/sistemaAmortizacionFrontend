@@ -2,18 +2,22 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calculator, PieChart } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
+  const { config } = useAuth();
+  const institutionName = config?.institutionName || 'Financiero DB';
+
   return (
     <div className="flex flex-col gap-4">
       <div className="glass-panel" style={{ padding: '3rem', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '600px' }}>
-          <h1 style={{ fontSize: '3rem', background: 'linear-gradient(to right, var(--primary-light), var(--secondary-light))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Bienvenido a Financiero DB
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px' }}>
+          <h1 style={{ fontSize: '3rem', background: 'linear-gradient(to right, var(--primary-light), var(--secondary-light))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>
+            Bienvenido a {institutionName}
           </h1>
           <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
             Tu plataforma integral para simulaciones de crédito e inversiones. 
-            Configura, simula o invierte en un solo lugar con la tecnología más avanzada.
+            Configura, simula o invierte en un solo lugar.
           </p>
           <div className="flex gap-4">
             <Link to="/simulator" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
