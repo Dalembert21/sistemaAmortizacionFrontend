@@ -86,9 +86,11 @@ const SuperAdminDashboard = () => {
       } else {
         const error = await res.json();
         console.error('Error al eliminar:', error.message || 'Error desconocido');
+        alert('Error al eliminar la institución: ' + (error.message || 'Error desconocido'));
       }
     } catch(e) {
       console.error('Error de conexión al intentar eliminar la organización:', e);
+      alert('Error de conexión al intentar eliminar la institución. Por favor, verifica tu conexión e intenta nuevamente.');
     }
   };
 
@@ -100,20 +102,20 @@ const SuperAdminDashboard = () => {
 
       <div className="glass-panel text-left">
         <h3 className="mb-4">Crear Nueva Institución</h3>
-        <form onSubmit={handleCreate} className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
+        <form onSubmit={handleCreate} className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', alignItems: 'end' }}>
           <div>
             <label>Nombre Institución</label>
-            <input type="text" value={newOrgName} onChange={e => setNewOrgName(e.target.value)} required />
+            <input type="text" value={newOrgName} onChange={e => setNewOrgName(e.target.value)} required placeholder="Ej: Banco Cooperativo XYZ" />
           </div>
           <div>
             <label>Usuario (Admin)</label>
-            <input type="text" value={newUser} onChange={e => setNewUser(e.target.value)} required />
+            <input type="text" value={newUser} onChange={e => setNewUser(e.target.value)} required placeholder="Usuario administrador" />
           </div>
           <div>
             <label>Contraseña</label>
-            <input type="text" value={newPass} onChange={e => setNewPass(e.target.value)} required />
+            <input type="text" value={newPass} onChange={e => setNewPass(e.target.value)} required placeholder="Contraseña temporal" />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ height: '45px' }}>
+          <button type="submit" className="btn btn-primary" style={{ height: '45px', width: '100%' }}>
             <PlusCircle size={18} /> Crear
           </button>
         </form>
@@ -121,7 +123,9 @@ const SuperAdminDashboard = () => {
 
       <div className="glass-panel">
         <h3 className="mb-4">Instituciones Registradas ({orgs.length})</h3>
-        <div className="table-container">
+        
+        {/* Vista Desktop - Tabla */}
+        <div className="table-container d-none d-md-block">
           <table>
             <thead>
               <tr>
@@ -157,6 +161,39 @@ const SuperAdminDashboard = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Vista Mobile - Cards */}
+        <div className="d-md-none">
+          {orgs.map(org => (
+            <div key={org.id} className="glass-panel mb-3" style={{ padding: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
+                <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 'bold' }}>
+                  {org.institutionName}
+                </h4>
+                {org.id !== '11111111-1111-1111-1111-111111111111' ? (
+                  <button 
+                    onClick={() => handleDelete(org.id, org.institutionName)}
+                    className="btn btn-danger"
+                    style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                    title="Eliminar organización"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                ) : (
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                    <AlertTriangle size={14} />
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                <strong>ID:</strong> <span style={{ wordBreak: 'break-all', fontSize: '0.8rem' }}>{org.id}</span>
+              </div>
+              <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                <strong>Admin:</strong> {org.adminUser}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
