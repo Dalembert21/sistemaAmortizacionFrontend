@@ -6,6 +6,7 @@ type Role = 'GUEST' | 'ADMIN' | 'SUPERADMIN';
 interface AuthContextType {
   role: Role;
   orgId: string;
+  isLoading: boolean;
   login: (user: string, pass: string) => Promise<boolean>;
   logout: () => void;
   config: any;
@@ -15,26 +16,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ✅ Organización por defecto: configurable por empresa compradora
-// Cuando una empresa compra el sistema, solo cambia VITE_DEFAULT_ORG_ID en .env
 const DEFAULT_ORG_ID = import.meta.env.VITE_DEFAULT_ORG_ID || '11111111-1111-1111-1111-111111111111';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<Role>('GUEST');
   const [orgId, setOrgId] = useState<string>(DEFAULT_ORG_ID);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [config, setConfig] = useState<any>(() => {
     const savedConfig = localStorage.getItem('auth_config');
     return savedConfig ? JSON.parse(savedConfig) : {
       institutionName: 'Sistema Financiero DB',
       logoBase64: '',
       credits: [],
-      investments: []
+      investments: [],
+      insuranceRate: 10,
+      donationSolca: 2
     };
   });
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-  // Buscar orgId por identificador de empresa (ej: "banco-pichincha")
   const fetchOrgIdByName = async (orgIdentifier: string): Promise<string | null> => {
     try {
       const res = await fetch(`${API_URL}/api/org/by-name/${orgIdentifier}`);
@@ -70,46 +71,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setRole(savedRole);
       setOrgId(savedOrgId);
       fetchConfig(savedOrgId);
-    } else {
-      // Revisar si tenemos un org guardado en sessionStorage (de la URL inicial)
-      let orgParam = sessionStorage.getItem('url_org_param');
+      setIsLoading(false);
+      return;
+    }
+    
+    let orgParam = sessionStorage.getItem('url_org_param');
+    
+    if (!orgParam) {
+      const urlParams = new URLSearchParams(window.location.search);
+      orgParam = urlParams.get('org');
       
-      if (!orgParam) {
-        // Intentar leer de la URL actual (por si acaso)
-        const urlParams = new URLSearchParams(window.location.search);
-        orgParam = urlParams.get('org');
-        
-        // Método alternativo: parsear manualmente
-        if (!orgParam && window.location.href.includes('?org=')) {
-          const urlParts = window.location.href.split('?org=');
-          if (urlParts.length > 1) {
-            orgParam = urlParts[1].split('&')[0];
-          }
-        }
-        
-        // Guardar en sessionStorage para persistencia
-        if (orgParam) {
-          sessionStorage.setItem('url_org_param', orgParam);
+      if (!orgParam && window.location.href.includes('?org=')) {
+        const urlParts = window.location.href.split('?org=');
+        if (urlParts.length > 1) {
+          orgParam = urlParts[1].split('&')[0];
         }
       }
       
       if (orgParam) {
-        // Es una empresa compradora: buscar su orgId por nombre/identificador
-        fetchOrgIdByName(orgParam).then(orgId => {
-          if (orgId) {
-            setOrgId(orgId);
-            fetchConfig(orgId);
-          } else {
-            // Empresa no encontrada: mostrar branding por defecto
-            setOrgId(DEFAULT_ORG_ID);
-            fetchConfig(DEFAULT_ORG_ID);
-          }
-        });
-      } else {
-        // Sistema público: tu branding por defecto
-        setOrgId(DEFAULT_ORG_ID);
-        fetchConfig(DEFAULT_ORG_ID);
+        sessionStorage.setItem('url_org_param', orgParam);
       }
+    }
+    
+    if (orgParam) {
+      fetchOrgIdByName(orgParam).then(orgId => {
+        if (orgId) {
+          setOrgId(orgId);
+          fetchConfig(orgId);
+        } else {
+          setOrgId(DEFAULT_ORG_ID);
+          fetchConfig(DEFAULT_ORG_ID);
+        }
+        setIsLoading(false);
+      });
+    } else {
+      setOrgId(DEFAULT_ORG_ID);
+      fetchConfig(DEFAULT_ORG_ID);
+      setIsLoading(false);
     }
   }, []);
 
@@ -151,13 +149,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (res.ok) {
         const data = await res.json();
         setRole(data.role);
+        
         if (data.orgId) {
           setOrgId(data.orgId);
           localStorage.setItem('auth_role', data.role);
           localStorage.setItem('auth_orgId', data.orgId);
-          // Guardamos el último orgId activo para persistencia
           localStorage.setItem('last_active_orgId', data.orgId);
           fetchConfig(data.orgId);
+        } else if (data.role === 'SUPERADMIN') {
+          const defaultOrgId = '11111111-1111-1111-1111-111111111111';
+          setOrgId(defaultOrgId);
+          localStorage.setItem('auth_role', data.role);
+          localStorage.setItem('auth_orgId', defaultOrgId);
+          localStorage.setItem('last_active_orgId', defaultOrgId);
+          fetchConfig(defaultOrgId);
         }
         return true;
       }
@@ -176,7 +181,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(newConfig)
       });
       if (res.ok) {
-        setConfig(newConfig); // Actualización inmediata local
+        setConfig(newConfig);
         localStorage.setItem('auth_config', JSON.stringify(newConfig));
       }
     } catch(e) {
@@ -191,12 +196,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setOrgId(DEFAULT_ORG_ID);
     localStorage.removeItem('auth_role');
     localStorage.removeItem('auth_orgId');
-    // Al cerrar sesión: volver a tu branding por defecto para usuarios invitados
     fetchConfig(DEFAULT_ORG_ID);
   };
 
   return (
-    <AuthContext.Provider value={{ role, orgId, login, logout, config, fetchConfig, updateConfig }}>
+    <AuthContext.Provider value={{ role, orgId, isLoading, login, logout, config, fetchConfig, updateConfig }}>
       {children}
     </AuthContext.Provider>
   );

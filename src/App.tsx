@@ -11,10 +11,24 @@ import Login from './pages/Login';
 import './index.css';
 
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactElement, requiredRole: string }) => {
-  const { role } = useAuth();
-  if (role !== requiredRole && role !== 'SUPERADMIN') {
+  const { role, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Cargando...</div>;
+  }
+  
+  if (role === 'GUEST') {
     return <Navigate to="/login" replace />;
   }
+  
+  if (requiredRole === 'ADMIN' && role !== 'ADMIN' && role !== 'SUPERADMIN') {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (requiredRole === 'SUPERADMIN' && role !== 'SUPERADMIN') {
+    return <Navigate to="/login" replace />;
+  }
+  
   return children;
 };
 

@@ -1,11 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Building, PlusCircle, Trash2, AlertTriangle } from 'lucide-react';
+import ConfirmModal from '../components/ConfirmModal';
+import SuccessModal from '../components/SuccessModal';
 
 const SuperAdminDashboard = () => {
   const [orgs, setOrgs] = useState<any[]>([]);
   const [newOrgName, setNewOrgName] = useState('');
   const [newUser, setNewUser] = useState('');
   const [newPass, setNewPass] = useState('');
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    orgId: string;
+    orgName: string;
+  }>({
+    isOpen: false,
+    orgId: '',
+    orgName: ''
+  });
+  const [successModal, setSuccessModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    title: '',
+    message: ''
+  });
 
   const fetchOrgs = async () => {
     try {
@@ -29,29 +49,43 @@ const SuperAdminDashboard = () => {
       if (res.ok) {
          setNewOrgName(''); setNewUser(''); setNewPass('');
          fetchOrgs();
+         setSuccessModal({
+           isOpen: true,
+           title: 'Institución Creada',
+           message: `"${newOrgName}" ha sido creada exitosamente. Ya está disponible para uso con el identificador: "${newOrgName.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-')}"`
+         });
       }
     } catch(e) {}
   };
 
-  const handleDelete = async (orgId: string, orgName: string) => {
-    if (!confirm(`¿Estás seguro de eliminar "${orgName}"? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+  const handleDelete = (orgId: string, orgName: string) => {
+    setDeleteModal({
+      isOpen: true,
+      orgId,
+      orgName
+    });
+  };
 
+  const confirmDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/orgs/${orgId}`, {
+      const res = await fetch(`http://localhost:3000/api/orgs/${deleteModal.orgId}`, {
         method: 'DELETE'
       });
       
       if (res.ok) {
-        alert('Organización eliminada exitosamente');
+        setDeleteModal({ isOpen: false, orgId: '', orgName: '' });
         fetchOrgs();
+        setSuccessModal({
+          isOpen: true,
+          title: 'Institución Eliminada',
+          message: `"${deleteModal.orgName}" ha sido eliminada permanentemente junto con todos sus datos asociados.`
+        });
       } else {
         const error = await res.json();
-        alert(`Error al eliminar: ${error.message || 'Error desconocido'}`);
+        console.error('Error al eliminar:', error.message || 'Error desconocido');
       }
     } catch(e) {
-      alert('Error de conexión al intentar eliminar la organización');
+      console.error('Error de conexión al intentar eliminar la organización:', e);
     }
   };
 
@@ -122,6 +156,25 @@ const SuperAdminDashboard = () => {
           </table>
         </div>
       </div>
+
+      {/* Modal de Confirmación de Eliminación */}
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, orgId: '', orgName: '' })}
+        onConfirm={confirmDelete}
+        title="Eliminar Organización"
+        message={`¿Estás seguro de eliminar "${deleteModal.orgName}"? Esta acción no se puede deshacer y se eliminarán todos los datos asociados (créditos, inversiones, configuración).`}
+        confirmText="Eliminar Permanentemente"
+        cancelText="Cancelar"
+        type="danger"
+      />
+
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ isOpen: false, title: '', message: '' })}
+        title={successModal.title}
+        message={successModal.message}
+      />
     </div>
   );
 };

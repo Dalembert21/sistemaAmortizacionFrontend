@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Settings, Save, Image as ImageIcon, Trash2, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import IndirectChargesConfig from '../components/IndirectChargesConfig';
 
 const AdminConfig = () => {
   const { config, updateConfig } = useAuth();
@@ -499,31 +500,7 @@ const AdminConfig = () => {
         </div>
       </div>
 
-      <div className="glass-panel">
-        <h3 className="mb-4">Cobros Indirectos</h3>
-        <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-          <div>
-            <label>Seguro de Desgravamen (Porcentaje %)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={insuranceRate}
-              onChange={(e) => setInsuranceRate(e.target.value)}
-            />
-            <small style={{ color: 'var(--text-muted)' }}>Se cobrará mensualmente este porcentaje</small>
-          </div>
-          <div>
-            <label>Donación SOLCA / Fundaciones (Valor Exacto $)</label>
-            <input
-              type="number"
-              step="0.5"
-              value={donationSolca}
-              onChange={(e) => setDonationSolca(e.target.value)}
-            />
-            <small style={{ color: 'var(--text-muted)' }}>Costo fijo mensual</small>
-          </div>
-        </div>
-      </div>
+      <IndirectChargesConfig />
     </div>
   );
 };
