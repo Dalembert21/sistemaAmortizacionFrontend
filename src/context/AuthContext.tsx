@@ -57,8 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    // Limpieza de caché forzada: Si el sistema detecta el nombre viejo guardado
-    // lo sobreescribe con el nuevo default para evitar confusión visual.
+    
     if (config?.institutionName === 'Financiera Financo') {
       setConfig({ ...config, institutionName: 'Sistema Financiero DB' });
     }
@@ -110,7 +109,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateConfig = async (newConfig: any) => {
-    if (role !== 'ADMIN') return;
+    if (role !== 'ADMIN' && role !== 'SUPERADMIN') return;
     try {
       const res = await fetch(`${API_URL}/api/config/${orgId}`, {
         method: 'POST',

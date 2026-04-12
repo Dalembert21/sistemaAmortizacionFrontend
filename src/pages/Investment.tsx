@@ -176,32 +176,55 @@ const Investment = () => {
       </h2>
 
       {/* Progress Tracker */}
-      <div className="flex justify-between items-center mb-4" style={{ padding: '1rem', background: 'var(--surface)', borderRadius: 'var(--radius-full)' }}>
-        <div style={{ color: step >= 1 ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: step >= 1 ? '600' : '400' }}>1. Simulación</div>
-        <div style={{ flex: 1, height: '2px', background: 'var(--border)', margin: '0 1rem' }}>
-          <div style={{ height: '100%', background: 'var(--secondary)', width: step >= 2 ? '100%' : '0%', transition: 'var(--transition)' }}></div>
-        </div>
-        <div style={{ color: step >= 2 ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: step >= 2 ? '600' : '400' }}>2. Validación Identidad</div>
-        <div style={{ flex: 1, height: '2px', background: 'var(--border)', margin: '0 1rem' }}>
-          <div style={{ height: '100%', background: 'var(--secondary)', width: step >= 3 ? '100%' : '0%', transition: 'var(--transition)' }}></div>
-        </div>
-        <div style={{ color: step >= 3 ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: step >= 3 ? '600' : '400' }}>3. Selección Banco</div>
-        <div style={{ flex: 1, height: '2px', background: 'var(--border)', margin: '0 1rem' }}>
-          <div style={{ height: '100%', background: 'var(--secondary)', width: step >= 4 ? '100%' : '0%', transition: 'var(--transition)' }}></div>
-        </div>
-        <div style={{ color: step >= 4 ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: step >= 4 ? '600' : '400' }}>4. Éxito</div>
+      <div className="progress-tracker-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', padding: '1rem', background: 'var(--surface)', borderRadius: 'var(--radius-lg)', flexWrap: 'nowrap' }}>
+        {[1, 2, 3, 4].map((s) => (
+          <React.Fragment key={s}>
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              gap: '0.25rem',
+              color: step >= s ? 'var(--primary)' : 'var(--text-muted)',
+              transition: 'var(--transition)'
+            }}>
+              <div style={{ 
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '50%', 
+                background: step >= s ? 'var(--primary)' : 'var(--surface)', 
+                border: `2px solid ${step >= s ? 'var(--primary)' : 'var(--border)'}`,
+                color: step >= s ? 'white' : 'var(--text-muted)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: '700',
+                fontSize: '0.8rem'
+              }}>
+                {step > s ? <CheckCircle size={16} /> : s}
+              </div>
+              <span className="mobile-hide" style={{ fontSize: '0.75rem', fontWeight: step >= s ? '600' : '400', whiteSpace: 'nowrap' }}>
+                {s === 1 ? 'Simulación' : s === 2 ? 'Identidad' : s === 3 ? 'Selección' : 'Éxito'}
+              </span>
+            </div>
+            {s < 4 && (
+              <div style={{ flex: 1, height: '2px', background: 'var(--border)', margin: '0 0.5rem', marginTop: '-1.25rem' }}>
+                <div style={{ height: '100%', background: 'var(--primary)', width: step > s ? '100%' : '0%', transition: 'var(--transition)' }} />
+              </div>
+            )}
+          </React.Fragment>
+        ))}
       </div>
 
       <AnimatePresence mode="wait">
         {step === 1 && (
           <motion.div key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="glass-panel">
             <h3>Póliza de Inversión</h3>
-            <div className="flex gap-4 mt-4">
-              <div className="flex-col w-full">
+            <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+              <div className="flex flex-col">
                 <label>Monto a Invertir</label>
                 <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} />
               </div>
-              <div className="flex-col w-full">
+              <div className="flex flex-col">
                 <label>Plazo (Meses)</label>
                 <input type="number" value={period} onChange={(e) => setPeriod(Number(e.target.value))} />
               </div>
@@ -253,7 +276,7 @@ const Investment = () => {
             <h3>Validación de Identidad Inteligente</h3>
             <p>Para asegurar tu identidad, la IA comparará la foto de tu cédula con tu rostro real.</p>
             
-            <div className="flex justify-center mt-8" style={{ gap: '2rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            <div className="flex justify-center mt-8" style={{ gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
                 <div style={{ 
                     width: '160px', height: '160px', 

@@ -91,12 +91,12 @@ const Simulator = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
       <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <Calculator color="var(--primary-light)" /> Simulador de Créditos
       </h2>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '1.5rem' }}>
+      <div className="simulator-grid" style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '1.5rem' }}>
         <div className="glass-panel h-fit">
           <h3 className="mb-4">Parámetros</h3>
 
@@ -172,15 +172,15 @@ const Simulator = () => {
         </div>
 
         <div className="glass-panel" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4" style={{ flexWrap: 'wrap', gap: '1rem' }}>
             <h3 style={{ margin: 0 }}>Tabla de Pagos</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, justifyContent: 'flex-end' }}>
               {table.length === 0 && (
-                <div style={{ background: 'rgba(var(--primary-rgb), 0.1)', borderLeft: '4px solid var(--primary)', padding: '0.6rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text)', fontSize: '0.9rem', fontWeight: '500' }}>
-                  se habilita el boton descargar tabla si primero se genera una
+                <div className="mobile-hide" style={{ background: 'rgba(var(--primary-rgb), 0.1)', borderLeft: '4px solid var(--primary)', padding: '0.6rem 1rem', borderRadius: 'var(--radius-sm)', color: 'var(--text)', fontSize: '0.8rem', fontWeight: '500' }}>
+                  Genere la tabla para descargar PDF
                 </div>
               )}
-              <button className="btn btn-success" onClick={handleDownload} disabled={table.length === 0}>
+              <button className="btn btn-success" onClick={handleDownload} disabled={table.length === 0} style={{ whiteSpace: 'nowrap' }}>
                 Descargar PDF
               </button>
             </div>

@@ -41,7 +41,7 @@ const SuperAdminDashboard = () => {
 
       <div className="glass-panel text-left">
         <h3 className="mb-4">Crear Nueva Institución</h3>
-        <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '1rem', alignItems: 'end' }}>
+        <form onSubmit={handleCreate} className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'end' }}>
           <div>
             <label>Nombre Institución</label>
             <input type="text" value={newOrgName} onChange={e => setNewOrgName(e.target.value)} required />
@@ -54,7 +54,7 @@ const SuperAdminDashboard = () => {
             <label>Contraseña</label>
             <input type="text" value={newPass} onChange={e => setNewPass(e.target.value)} required />
           </div>
-          <button type="submit" className="btn btn-primary h-full">
+          <button type="submit" className="btn btn-primary" style={{ height: '45px' }}>
             <PlusCircle size={18} /> Crear
           </button>
         </form>

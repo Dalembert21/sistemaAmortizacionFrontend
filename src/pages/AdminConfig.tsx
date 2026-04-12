@@ -224,7 +224,7 @@ const AdminConfig = () => {
 
       <div className="glass-panel">
         <h3 className="mb-4">Información General</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+        <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
           <div>
             <label>Nombre de la Institución</label>
             <input
@@ -246,7 +246,7 @@ const AdminConfig = () => {
       </div>
 
       <div className="glass-panel">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
           <h3 style={{ margin: 0 }}>Configuración de Tipos de Crédito</h3>
           <button className="btn btn-secondary" onClick={() => {
             const nextId = credits.length > 0 ? Math.max(...credits.map(c => c.id || 0)) + 1 : 1;
@@ -255,7 +255,9 @@ const AdminConfig = () => {
             + Agregar Tipo
           </button>
         </div>
-        <div className="table-container">
+
+        {/* Desktop: Tabla */}
+        <div className="table-container desktop-only-table">
           <table>
             <thead>
               <tr>
@@ -310,10 +312,70 @@ const AdminConfig = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Móvil: Tarjetas */}
+        <div className="mobile-only-cards">
+          {credits.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+              No hay tipos de crédito configurados.
+            </div>
+          ) : (
+            credits.map((credit, index) => (
+              <div key={credit.id} style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1rem', background: 'var(--surface-light)' }}>
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tipo de Crédito</label>
+                  <input type="text" value={credit.name} onChange={(e) => {
+                    setCredits(prev => prev.map((c, i) => i === index ? { ...c, name: e.target.value } : c));
+                  }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tasa Min (%)</label>
+                    <input type="number" step="0.1" value={credit.minRate} onChange={(e) => {
+                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, minRate: e.target.value } : c));
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tasa Max (%)</label>
+                    <input type="number" step="0.1" value={credit.maxRate} onChange={(e) => {
+                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, maxRate: e.target.value } : c));
+                    }} />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Monto Min ($)</label>
+                    <input type="number" value={credit.minAmount} onChange={(e) => {
+                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, minAmount: e.target.value } : c));
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Monto Max ($)</label>
+                    <input type="number" value={credit.maxAmount} onChange={(e) => {
+                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, maxAmount: e.target.value } : c));
+                    }} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem', background: '#d1fae5', color: '#059669', border: 'none' }} onClick={() => {
+                    if (validateSingleRate(credit)) {
+                      triggerToast(`"${credit.name}" validado.`, true);
+                    }
+                  }}>
+                    <CheckCircle size={14} /> Aceptar
+                  </button>
+                  <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem', background: '#fee2e2', color: 'var(--danger)', border: 'none' }} onClick={() => setDeleteConfirm({ type: 'credit', index })}>
+                    <Trash2 size={14} /> Eliminar
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       <div className="glass-panel">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
           <h3 style={{ margin: 0 }}>Configuración de Tipos de Inversión</h3>
           <button className="btn btn-secondary" onClick={() => {
             const nextId = investments.length > 0 ? Math.max(...investments.map(c => c.id || 0)) + 1 : 1;
@@ -322,7 +384,9 @@ const AdminConfig = () => {
             + Agregar Tipo
           </button>
         </div>
-        <div className="table-container">
+
+        {/* Desktop: Tabla */}
+        <div className="table-container desktop-only-table">
           <table>
             <thead>
               <tr>
@@ -375,11 +439,69 @@ const AdminConfig = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Móvil: Tarjetas */}
+        <div className="mobile-only-cards">
+          {investments.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+              No hay tipos de inversión configurados.
+            </div>
+          ) : (
+            investments.map((inv, index) => (
+              <div key={inv.id} style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1rem', background: 'var(--surface-light)' }}>
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tipo de Inversión</label>
+                  <input type="text" value={inv.name} onChange={(e) => {
+                    setInvestments(prev => prev.map((c, i) => i === index ? { ...c, name: e.target.value } : c));
+                  }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Monto Min ($)</label>
+                    <input type="number" value={inv.minAmount} onChange={(e) => {
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minAmount: e.target.value } : c));
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Monto Max ($)</label>
+                    <input type="number" value={inv.maxAmount} onChange={(e) => {
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxAmount: e.target.value } : c));
+                    }} />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Plazo Min (Meses)</label>
+                    <input type="number" value={inv.minTerm} onChange={(e) => {
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minTerm: e.target.value } : c));
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Plazo Max (Meses)</label>
+                    <input type="number" value={inv.maxTerm} onChange={(e) => {
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxTerm: e.target.value } : c));
+                    }} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem', background: '#d1fae5', color: '#059669', border: 'none' }} onClick={() => {
+                    triggerToast(`"${inv.name}" validado.`, true);
+                  }}>
+                    <CheckCircle size={14} /> Aceptar
+                  </button>
+                  <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem', background: '#fee2e2', color: 'var(--danger)', border: 'none' }} onClick={() => setDeleteConfirm({ type: 'investment', index })}>
+                    <Trash2 size={14} /> Eliminar
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       <div className="glass-panel">
         <h3 className="mb-4">Cobros Indirectos</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+        <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
           <div>
             <label>Seguro de Desgravamen (Porcentaje %)</label>
             <input
