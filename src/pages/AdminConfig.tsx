@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Settings, Save, Image as ImageIcon, Trash2, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import IndirectChargesConfig from '../components/IndirectChargesConfig';
 
 const AdminConfig = () => {
   const { config, updateConfig } = useAuth();
@@ -11,8 +10,6 @@ const AdminConfig = () => {
 
   const [credits, setCredits] = useState<any[]>([]);
   const [investments, setInvestments] = useState<any[]>([]);
-  const [insuranceRate, setInsuranceRate] = useState<number | string>(0);
-  const [donationSolca, setDonationSolca] = useState<number | string>(0);
   const [logoBase64, setLogoBase64] = useState<string>('');
   const [showToast, setShowToast] = useState({ show: false, message: '', isReminder: false });
   const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'credit' | 'investment', index: number } | null>(null);
@@ -39,8 +36,6 @@ const AdminConfig = () => {
       setInstitutionName(config.institutionName || 'Sistema Financiero DB');
       setCredits(config.credits && config.credits.length > 0 ? config.credits : defaultCredits);
       setInvestments(config.investments && config.investments.length > 0 ? config.investments : defaultInvestments);
-      setInsuranceRate(config.insuranceRate || 0);
-      setDonationSolca(config.donationSolca || 0);
       setLogoBase64(config.logoBase64 || '');
     }
   }, [config]);
@@ -62,12 +57,10 @@ const AdminConfig = () => {
 
     const isNameDiff = institutionName !== (config.institutionName || 'Sistema Financiero DB');
     const isLogoDiff = logoBase64 !== (config.logoBase64 || '');
-    const isInsDiff = Number(insuranceRate) !== Number(config.insuranceRate || 0);
-    const isDonDiff = Number(donationSolca) !== Number(config.donationSolca || 0);
     const isCreditsDiff = normalize(credits) !== normalize(configCredits);
     const isInvestsDiff = normalize(investments) !== normalize(configInvestments);
 
-    return isNameDiff || isLogoDiff || isInsDiff || isDonDiff || isCreditsDiff || isInvestsDiff;
+    return isNameDiff || isLogoDiff || isCreditsDiff || isInvestsDiff;
   };
 
   const LEGAL_LIMITS: Record<string, { max: number }> = {
@@ -103,9 +96,7 @@ const AdminConfig = () => {
        institutionName,
        logoBase64,
        credits,
-       investments,
-       insuranceRate: Number(insuranceRate),
-       donationSolca: Number(donationSolca)
+       investments
     });
     triggerToast("Los cambios fueron realizados con éxito.", false);
   };
@@ -332,29 +323,33 @@ const AdminConfig = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                   <div>
                     <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tasa Min (%)</label>
-                    <input type="number" step="0.1" value={credit.minRate} onChange={(e) => {
-                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, minRate: e.target.value } : c));
-                    }} />
+                    <input type="number" step="0.1" value={credit.minRate || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, minRate: value } : c));
+                    }} onFocus={(e) => e.target.select()} />
                   </div>
                   <div>
                     <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Tasa Max (%)</label>
-                    <input type="number" step="0.1" value={credit.maxRate} onChange={(e) => {
-                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, maxRate: e.target.value } : c));
-                    }} />
+                    <input type="number" step="0.1" value={credit.maxRate || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, maxRate: value } : c));
+                    }} onFocus={(e) => e.target.select()} />
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                   <div>
                     <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Monto Min ($)</label>
-                    <input type="number" value={credit.minAmount} onChange={(e) => {
-                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, minAmount: e.target.value } : c));
-                    }} />
+                    <input type="number" value={credit.minAmount || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, minAmount: value } : c));
+                    }} onFocus={(e) => e.target.select()} />
                   </div>
                   <div>
                     <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Monto Max ($)</label>
-                    <input type="number" value={credit.maxAmount} onChange={(e) => {
-                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, maxAmount: e.target.value } : c));
-                    }} />
+                    <input type="number" value={credit.maxAmount || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                      setCredits(prev => prev.map((c, i) => i === index ? { ...c, maxAmount: value } : c));
+                    }} onFocus={(e) => e.target.select()} />
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -412,18 +407,22 @@ const AdminConfig = () => {
                     <td><input type="text" style={{ minWidth: '230px' }} value={inv.name} onChange={(e) => {
                       setInvestments(prev => prev.map((c, i) => i === index ? { ...c, name: e.target.value } : c));
                     }} /></td>
-                    <td><input type="number" value={inv.minAmount} onChange={(e) => {
-                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minAmount: e.target.value } : c));
-                    }} /></td>
-                    <td><input type="number" value={inv.maxAmount} onChange={(e) => {
-                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxAmount: e.target.value } : c));
-                    }} /></td>
-                    <td><input type="number" value={inv.minTerm} onChange={(e) => {
-                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minTerm: e.target.value } : c));
-                    }} /></td>
-                    <td><input type="number" value={inv.maxTerm} onChange={(e) => {
-                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxTerm: e.target.value } : c));
-                    }} /></td>
+                    <td><input type="number" value={inv.minAmount || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minAmount: value } : c));
+                    }} onFocus={(e) => e.target.select()} /></td>
+                    <td><input type="number" value={inv.maxAmount || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxAmount: value } : c));
+                    }} onFocus={(e) => e.target.select()} /></td>
+                    <td><input type="number" value={inv.minTerm || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseInt(e.target.value);
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minTerm: value } : c));
+                    }} onFocus={(e) => e.target.select()} /></td>
+                    <td><input type="number" value={inv.maxTerm || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseInt(e.target.value);
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxTerm: value } : c));
+                    }} onFocus={(e) => e.target.select()} /></td>
                     <td style={{ display: 'flex', gap: '0.4rem' }}>
                       <button className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', background: '#d1fae5', color: '#059669', border: 'none' }} onClick={() => {
                         triggerToast(`Fila "${inv.name}" validada correctamente.`, true);
@@ -459,29 +458,33 @@ const AdminConfig = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                   <div>
                     <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Monto Min ($)</label>
-                    <input type="number" value={inv.minAmount} onChange={(e) => {
-                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minAmount: e.target.value } : c));
-                    }} />
+                    <input type="number" value={inv.minAmount || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minAmount: value } : c));
+                    }} onFocus={(e) => e.target.select()} />
                   </div>
                   <div>
                     <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Monto Max ($)</label>
-                    <input type="number" value={inv.maxAmount} onChange={(e) => {
-                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxAmount: e.target.value } : c));
-                    }} />
+                    <input type="number" value={inv.maxAmount || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxAmount: value } : c));
+                    }} onFocus={(e) => e.target.select()} />
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                   <div>
                     <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Plazo Min (Meses)</label>
-                    <input type="number" value={inv.minTerm} onChange={(e) => {
-                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minTerm: e.target.value } : c));
-                    }} />
+                    <input type="number" value={inv.minTerm || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseInt(e.target.value);
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, minTerm: value } : c));
+                    }} onFocus={(e) => e.target.select()} />
                   </div>
                   <div>
                     <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Plazo Max (Meses)</label>
-                    <input type="number" value={inv.maxTerm} onChange={(e) => {
-                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxTerm: e.target.value } : c));
-                    }} />
+                    <input type="number" value={inv.maxTerm || ''} onChange={(e) => {
+                      const value = e.target.value === '' ? 0 : parseInt(e.target.value);
+                      setInvestments(prev => prev.map((c, i) => i === index ? { ...c, maxTerm: value } : c));
+                    }} onFocus={(e) => e.target.select()} />
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -499,8 +502,6 @@ const AdminConfig = () => {
           )}
         </div>
       </div>
-
-      <IndirectChargesConfig />
     </div>
   );
 };
