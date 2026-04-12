@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Building, PlusCircle } from 'lucide-react';
+import { Building, PlusCircle, Trash2, AlertTriangle } from 'lucide-react';
 
 const SuperAdminDashboard = () => {
   const [orgs, setOrgs] = useState<any[]>([]);
@@ -31,6 +31,28 @@ const SuperAdminDashboard = () => {
          fetchOrgs();
       }
     } catch(e) {}
+  };
+
+  const handleDelete = async (orgId: string, orgName: string) => {
+    if (!confirm(`¿Estás seguro de eliminar "${orgName}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/orgs/${orgId}`, {
+        method: 'DELETE'
+      });
+      
+      if (res.ok) {
+        alert('Organización eliminada exitosamente');
+        fetchOrgs();
+      } else {
+        const error = await res.json();
+        alert(`Error al eliminar: ${error.message || 'Error desconocido'}`);
+      }
+    } catch(e) {
+      alert('Error de conexión al intentar eliminar la organización');
+    }
   };
 
   return (
@@ -69,6 +91,7 @@ const SuperAdminDashboard = () => {
                 <th>ID Organización</th>
                 <th>Nombre</th>
                 <th>Usuario Administrador</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -77,6 +100,22 @@ const SuperAdminDashboard = () => {
                   <td>{org.id}</td>
                   <td style={{ fontWeight: 'bold' }}>{org.institutionName}</td>
                   <td>{org.adminUser}</td>
+                  <td>
+                    {org.id !== '11111111-1111-1111-1111-111111111111' ? (
+                      <button 
+                        onClick={() => handleDelete(org.id, org.institutionName)}
+                        className="btn btn-danger"
+                        style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                        title="Eliminar organización"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    ) : (
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                        <AlertTriangle size={16} /> Default
+                      </span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

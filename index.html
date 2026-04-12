@@ -8,6 +8,16 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Capturar parámetros de URL ANTES de React
+      (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orgParam = urlParams.get('org');
+        if (orgParam) {
+          sessionStorage.setItem('url_org_param', orgParam);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
