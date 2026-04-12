@@ -29,7 +29,8 @@ const SuperAdminDashboard = () => {
 
   const fetchOrgs = async () => {
     try {
-      const res = await fetch('http://localhost:3000/api/orgs');
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const res = await fetch(`${API_URL}/api/orgs`);
       if (res.ok) setOrgs(await res.json());
     } catch(e) {}
   };
@@ -41,7 +42,8 @@ const SuperAdminDashboard = () => {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:3000/api/orgs', {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const res = await fetch(`${API_URL}/api/orgs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ institutionName: newOrgName, adminUser: newUser, adminPass: newPass })
@@ -68,7 +70,8 @@ const SuperAdminDashboard = () => {
 
   const confirmDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/orgs/${deleteModal.orgId}`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const res = await fetch(`${API_URL}/api/orgs/${deleteModal.orgId}`, {
         method: 'DELETE'
       });
       
