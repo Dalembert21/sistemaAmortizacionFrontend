@@ -519,7 +519,7 @@ const AdminConfig = () => {
 
       <IndirectChargesConfig 
         initialCharges={indirectCharges}
-        onChangesMade={(hasChanges) => {
+        onChangesMade={() => {
           // This will be handled by the main hasChanges function
         }}
         onChargesUpdate={(charges) => {

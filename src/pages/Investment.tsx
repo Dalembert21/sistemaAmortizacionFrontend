@@ -167,7 +167,7 @@ const Investment = () => {
 
   // Obtener la tasa según el tipo de inversión seleccionado
   const getAnnualRate = () => {
-    const selectedInvestment = investments.find(inv => inv.id === type);
+    const selectedInvestment = investments.find((inv: any) => inv.id === type);
     if (selectedInvestment) {
       // Si la inversión tiene una tasa configurada, usarla
       if (selectedInvestment.annualRate) {

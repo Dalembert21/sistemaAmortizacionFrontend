@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Plus, Trash2, Edit2 } from 'lucide-react';
 
 interface IndirectCharge {
   id: number;
@@ -21,14 +21,6 @@ const IndirectChargesConfig = ({
 }) => {
   const [charges, setCharges] = useState<IndirectCharge[]>([]);
   const [originalCharges, setOriginalCharges] = useState<IndirectCharge[]>([]);
-  const [newCharge, setNewCharge] = useState<Partial<IndirectCharge>>({
-    name: '',
-    chargeType: 'PERCENTAGE',
-    value: 0,
-    calculationBase: 'INITIAL_BALANCE',
-    isActive: true
-  });
-  const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
