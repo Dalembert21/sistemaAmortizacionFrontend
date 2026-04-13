@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, TrendingUp, DollarSign, Calendar, Building, ChevronDown, ChevronUp } from 'lucide-react';
+import { TrendingUp, DollarSign, Calendar, Building, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface InvestmentRecord {
   id: string;
   client_name: string;
   client_identification: string;
+  client_phone?: string;
   investment_type: string;
   amount: number;
   period_months: number;
@@ -30,13 +31,11 @@ interface InvestmentStats {
 }
 
 const InvestmentHistory = () => {
-  const { config, orgId, role } = useAuth();
+  const { role, orgId, config } = useAuth();
   const [investments, setInvestments] = useState<InvestmentRecord[]>([]);
   const [stats, setStats] = useState<InvestmentStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -49,7 +48,12 @@ const InvestmentHistory = () => {
   const fetchInvestmentHistory = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/investment/${orgId}/history`);
+      // Los SuperAdmins ven todas las inversiones de todas las instituciones
+      const endpoint = role === 'SUPERADMIN' 
+        ? `${API_URL}/api/investment/all/history` 
+        : `${API_URL}/api/investment/${orgId}/history`;
+      
+      const response = await fetch(endpoint);
       if (!response.ok) {
         throw new Error('Error al obtener historial de inversiones');
       }
@@ -64,14 +68,19 @@ const InvestmentHistory = () => {
 
   const fetchInvestmentStats = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/investment/${orgId}/stats`);
+      // Los SuperAdmins ven estadísticas de todas las instituciones
+      const endpoint = role === 'SUPERADMIN' 
+        ? `${API_URL}/api/investment/all/stats` 
+        : `${API_URL}/api/investment/${orgId}/stats`;
+      
+      const response = await fetch(endpoint);
       if (!response.ok) {
         throw new Error('Error al obtener estadísticas');
       }
       const data = await response.json();
       setStats(data);
     } catch (err) {
-      console.error('Error fetching stats:', err);
+      console.error('Error al obtener estadísticas:', err);
     }
   };
 
@@ -85,13 +94,7 @@ const InvestmentHistory = () => {
     setExpandedRows(newExpanded);
   };
 
-  const filteredInvestments = investments.filter(investment => {
-    const matchesSearch = investment.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         investment.client_identification.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         investment.selected_bank.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = !filterType || investment.investment_type === filterType;
-    return matchesSearch && matchesType;
-  });
+  const displayedInvestments = investments;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-EC', {
@@ -109,8 +112,6 @@ const InvestmentHistory = () => {
       minute: '2-digit'
     });
   };
-
-  const investmentTypes = [...new Set(investments.map(inv => inv.investment_type))];
 
   if (loading) {
     return (
@@ -179,51 +180,13 @@ const InvestmentHistory = () => {
         </div>
       )}
 
-      {/* Filtros */}
-      <div className="glass-panel">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Filter size={16} />
-            Filtros y Búsqueda
-          </div>
-          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-            <div className="flex flex-col">
-              <label className="text-sm text-muted mb-1">Buscar cliente o banco</label>
-              <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" />
-                <input
-                  type="text"
-                  placeholder="Nombre, cédula o banco..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <label className="text-sm text-muted mb-1">Tipo de inversión</label>
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="">Todos los tipos</option>
-                {investmentTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Tabla de inversiones */}
       <div className="glass-panel">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold">Inversiones Registradas ({filteredInvestments.length})</h3>
+          <h3 className="font-semibold">Inversiones Registradas ({investments.length})</h3>
         </div>
 
-        {filteredInvestments.length === 0 ? (
+        {investments.length === 0 ? (
           <div className="text-center py-8 text-muted">
             <Building size={48} className="mx-auto mb-4 opacity-50" />
             <p>No se encontraron inversiones</p>
@@ -234,6 +197,7 @@ const InvestmentHistory = () => {
               <thead>
                 <tr className="border-b">
                   <th className="text-left p-3">Cliente</th>
+                  <th className="text-left p-3">Contacto</th>
                   <th className="text-left p-3">Tipo</th>
                   <th className="text-right p-3">Monto</th>
                   <th className="text-right p-3">Tasa</th>
@@ -245,7 +209,7 @@ const InvestmentHistory = () => {
               </thead>
               <tbody>
                 <AnimatePresence>
-                  {filteredInvestments.map((investment, index) => (
+                  {investments.map((investment, index) => (
                     <motion.tr
                       key={investment.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -258,6 +222,25 @@ const InvestmentHistory = () => {
                         <div className="flex flex-col">
                           <span className="font-medium">{investment.client_name}</span>
                           <span className="text-sm text-muted">{investment.client_identification}</span>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex flex-col">
+                          {investment.client_phone ? (
+                            <>
+                              <span className="text-sm font-medium">{investment.client_phone}</span>
+                              <a 
+                                href={`https://wa.me/593${investment.client_phone.substring(1)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-green-600 hover:text-green-700 underline"
+                              >
+                                WhatsApp
+                              </a>
+                            </>
+                          ) : (
+                            <span className="text-sm text-muted">No registrado</span>
+                          )}
                         </div>
                       </td>
                       <td className="p-3">
