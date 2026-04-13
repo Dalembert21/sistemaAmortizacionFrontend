@@ -165,7 +165,28 @@ const Investment = () => {
 
   const bancos = role === 'GUEST' ? guestBanks : [guestBanks[0]];
 
-  const annualRate = 7.5 + (period >= 12 ? 1.5 : 0) + (amount >= 10000 ? 1 : 0);
+  // Obtener la tasa según el tipo de inversión seleccionado
+  const getAnnualRate = () => {
+    const selectedInvestment = investments.find(inv => inv.id === type);
+    if (selectedInvestment) {
+      // Si la inversión tiene una tasa configurada, usarla
+      if (selectedInvestment.annualRate) {
+        return selectedInvestment.annualRate;
+      }
+      // Si no, calcular según el tipo con tasas diferentes
+      if (selectedInvestment.name === 'Corto Plazo') {
+        return 7.5 + (period >= 12 ? 1.5 : 0) + (amount >= 10000 ? 1 : 0);
+      } else if (selectedInvestment.name === 'Largo Plazo') {
+        return 8.5 + (period >= 12 ? 1.5 : 0) + (amount >= 10000 ? 1 : 0);
+      } else if (selectedInvestment.name === 'Ahora Flex') {
+        return 8.0 + (period >= 12 ? 1.5 : 0) + (amount >= 10000 ? 1 : 0);
+      }
+    }
+    // Valor por defecto si no hay configuración
+    return 7.5 + (period >= 12 ? 1.5 : 0) + (amount >= 10000 ? 1 : 0);
+  };
+
+  const annualRate = getAnnualRate();
   const interestEarned = amount * (annualRate / 100) * (period / 12);
   const totalReturn = amount + interestEarned;
 

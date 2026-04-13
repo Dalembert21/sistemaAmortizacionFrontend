@@ -24,13 +24,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [config, setConfig] = useState<any>(() => {
     const savedConfig = localStorage.getItem('auth_config');
-    return savedConfig ? JSON.parse(savedConfig) : {
+    if (savedConfig) {
+      const parsed = JSON.parse(savedConfig);
+      // Asegurarse de que indirectCharges exista
+      if (!parsed.indirectCharges) {
+        parsed.indirectCharges = [];
+      }
+      return parsed;
+    }
+    return {
       institutionName: 'Sistema Financiero DB',
       logoBase64: '',
       credits: [],
       investments: [],
       insuranceRate: 10,
-      donationSolca: 2
+      donationSolca: 2,
+      indirectCharges: []
     };
   });
 
@@ -52,11 +61,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchConfig = async (forcedOrgId?: string) => {
     try {
       const targetOrg = forcedOrgId || orgId;
+      console.log(`AuthContext - Fetching config for org: ${targetOrg}`);
       const res = await fetch(`${API_URL}/api/config/${targetOrg}`);
       if (res.ok) {
         const data = await res.json();
+        console.log('AuthContext - Config received from backend:', data);
+        console.log('AuthContext - indirectCharges in response:', data.indirectCharges);
+        
+        // Limpiar localStorage antiguo y guardar nuevo config completo
+        localStorage.removeItem('auth_config');
         setConfig(data);
         localStorage.setItem('auth_config', JSON.stringify(data));
+      } else {
+        console.error('AuthContext - Failed to fetch config:', res.status);
       }
     } catch (e) {
       console.warn("Backend not running or org missing:", e);

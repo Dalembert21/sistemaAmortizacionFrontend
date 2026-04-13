@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Settings, Save, Image as ImageIcon, Trash2, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import IndirectChargesConfig from '../components/IndirectChargesConfig';
 
 const AdminConfig = () => {
   const { config, updateConfig } = useAuth();
@@ -10,6 +11,7 @@ const AdminConfig = () => {
 
   const [credits, setCredits] = useState<any[]>([]);
   const [investments, setInvestments] = useState<any[]>([]);
+  const [indirectCharges, setIndirectCharges] = useState<any[]>([]);
   const [logoBase64, setLogoBase64] = useState<string>('');
   const [showToast, setShowToast] = useState({ show: false, message: '', isReminder: false });
   const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'credit' | 'investment', index: number } | null>(null);
@@ -36,6 +38,7 @@ const AdminConfig = () => {
       setInstitutionName(config.institutionName || 'Sistema Financiero DB');
       setCredits(config.credits && config.credits.length > 0 ? config.credits : defaultCredits);
       setInvestments(config.investments && config.investments.length > 0 ? config.investments : defaultInvestments);
+      setIndirectCharges(config.indirectCharges || []);
       setLogoBase64(config.logoBase64 || '');
     }
   }, [config]);
@@ -55,12 +58,22 @@ const AdminConfig = () => {
       maxTerm: c.maxTerm !== undefined ? Number(c.maxTerm) : undefined
     })));
 
+    const normalizeCharges = (arr: any[]) => JSON.stringify(arr.map(c => ({
+      id: c.id,
+      name: String(c.name).trim(),
+      chargeType: c.chargeType,
+      value: Number(c.value),
+      calculationBase: c.calculationBase,
+      isActive: Boolean(c.isActive)
+    })));
+
     const isNameDiff = institutionName !== (config.institutionName || 'Sistema Financiero DB');
     const isLogoDiff = logoBase64 !== (config.logoBase64 || '');
     const isCreditsDiff = normalize(credits) !== normalize(configCredits);
     const isInvestsDiff = normalize(investments) !== normalize(configInvestments);
+    const isChargesDiff = normalizeCharges(indirectCharges) !== normalizeCharges(config.indirectCharges || []);
 
-    return isNameDiff || isLogoDiff || isCreditsDiff || isInvestsDiff;
+    return isNameDiff || isLogoDiff || isCreditsDiff || isInvestsDiff || isChargesDiff;
   };
 
   const LEGAL_LIMITS: Record<string, { max: number }> = {
@@ -96,7 +109,8 @@ const AdminConfig = () => {
        institutionName,
        logoBase64,
        credits,
-       investments
+       investments,
+       indirectCharges
     });
     triggerToast("Los cambios fueron realizados con éxito.", false);
   };
@@ -502,6 +516,16 @@ const AdminConfig = () => {
           )}
         </div>
       </div>
+
+      <IndirectChargesConfig 
+        initialCharges={indirectCharges}
+        onChangesMade={(hasChanges) => {
+          // This will be handled by the main hasChanges function
+        }}
+        onChargesUpdate={(charges) => {
+          setIndirectCharges(charges);
+        }}
+      />
     </div>
   );
 };
