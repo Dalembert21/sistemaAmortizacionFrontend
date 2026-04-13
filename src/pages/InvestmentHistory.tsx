@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, DollarSign, Calendar, Building, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 interface InvestmentRecord {
   id: string;
@@ -32,6 +33,12 @@ interface InvestmentStats {
 
 const InvestmentHistory = () => {
   const { role, orgId, config } = useAuth();
+  
+  // Verificación de seguridad: solo ADMIN y SUPERADMIN pueden acceder
+  if (role !== 'ADMIN' && role !== 'SUPERADMIN') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
   const [investments, setInvestments] = useState<InvestmentRecord[]>([]);
   const [stats, setStats] = useState<InvestmentStats | null>(null);
   const [loading, setLoading] = useState(true);
