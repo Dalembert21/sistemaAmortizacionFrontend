@@ -94,8 +94,7 @@ const InvestmentHistory = () => {
     setExpandedRows(newExpanded);
   };
 
-  const displayedInvestments = investments;
-
+  
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-EC', {
       style: 'currency',
