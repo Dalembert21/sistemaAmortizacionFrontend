@@ -34,11 +34,15 @@ const AdminConfig = () => {
   ];
 
   useEffect(() => {
+    console.log('AdminConfig - config recibido:', config);
     if (config) {
+      console.log('AdminConfig - config.indirectCharges:', config.indirectCharges);
+      console.log('AdminConfig - config.indirectCharges length:', config.indirectCharges?.length);
       setInstitutionName(config.institutionName || 'Sistema Financiero DB');
       setCredits(config.credits && config.credits.length > 0 ? config.credits : defaultCredits);
       setInvestments(config.investments && config.investments.length > 0 ? config.investments : defaultInvestments);
       setIndirectCharges(config.indirectCharges || []);
+      console.log('AdminConfig - indirectCharges establecidos:', config.indirectCharges || []);
       setLogoBase64(config.logoBase64 || '');
     }
   }, [config]);

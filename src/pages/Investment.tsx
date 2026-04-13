@@ -6,7 +6,7 @@ import Tesseract from 'tesseract.js';
 import * as faceapi from 'face-api.js';
 
 const Investment = () => {
-  const { config, role } = useAuth();
+  const { config, role, orgId } = useAuth();
   
   const defaultInvestments = [
     { id: 1, name: 'Corto Plazo', minAmount: 100, maxAmount: 10000, minTerm: 1, maxTerm: 12 },
@@ -189,6 +189,39 @@ const Investment = () => {
   const annualRate = getAnnualRate();
   const interestEarned = amount * (annualRate / 100) * (period / 12);
   const totalReturn = amount + interestEarned;
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+  const saveInvestmentRecord = async () => {
+    try {
+      const selectedInvestment = investments.find((inv: any) => inv.id === type);
+      const investmentData = {
+        clientName: 'Cliente Anónimo', // En un futuro se podría pedir este dato
+        clientIdentification: 'N/A', // En un futuro se podría pedir este dato
+        investmentType: selectedInvestment?.name || 'Desconocido',
+        amount,
+        period,
+        annualRate,
+        interestEarned,
+        totalReturn,
+        selectedBank,
+        identityValidated: isBiometricValid,
+        facialRecognitionScore: 99.8
+      };
+
+      const response = await fetch(`${API_URL}/api/investment/${orgId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(investmentData)
+      });
+
+      if (!response.ok) {
+        console.error('Error al guardar registro de inversión');
+      }
+    } catch (error) {
+      console.error('Error al guardar registro:', error);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4 max-w-4xl mx-auto">
@@ -412,7 +445,13 @@ const Investment = () => {
              <h2>¡Inversión Procesada con Éxito!</h2>
              <p>Acabas de escoger efectuar la inversión con <strong>{selectedBank}</strong>... ¡fue tu mejor elección!</p>
              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Identidad validada al 99.8% vía Reconocimiento Facial.</p>
-             <button className="btn btn-primary mt-6" onClick={() => { resetValidation(); setStep(1); setSelectedBank(''); }}>Finalizar y Salir</button>
+             <button className="btn btn-primary mt-6" onClick={() => {
+               // Guardar el registro antes de finalizar
+               saveInvestmentRecord();
+               resetValidation(); 
+               setStep(1); 
+               setSelectedBank(''); 
+             }}>Finalizar y Salir</button>
           </motion.div>
         )}
       </AnimatePresence>

@@ -35,15 +35,21 @@ const IndirectChargesConfig = ({
   const [chargeToDelete, setChargeToDelete] = useState<number | null>(null);
 
   useEffect(() => {
+    console.log('IndirectChargesConfig - initialCharges:', initialCharges);
+    console.log('IndirectChargesConfig - initialCharges length:', initialCharges?.length);
+    
     if (initialCharges && initialCharges.length > 0) {
+      console.log('IndirectChargesConfig - Procesando cargos iniciales...');
       const chargesList = initialCharges.map((ch: any) => ({
         ...ch,
         id: ch.id || Math.random(),
         value: typeof ch.value === 'string' ? parseFloat(ch.value.replace(',', '.')) : (typeof ch.value === 'number' ? ch.value : parseFloat(String(ch.value).replace(',', '.')))
       }));
+      console.log('IndirectChargesConfig - chargesList procesado:', chargesList);
       setCharges(chargesList);
       setOriginalCharges(JSON.parse(JSON.stringify(chargesList)));
     } else {
+      console.log('IndirectChargesConfig - No hay cargos iniciales, dejando vacío');
       // Si no hay cargos iniciales, dejar vacío
       setCharges([]);
       setOriginalCharges([]);

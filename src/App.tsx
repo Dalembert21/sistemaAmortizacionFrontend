@@ -7,6 +7,7 @@ import Simulator from './pages/Simulator';
 import AdminConfig from './pages/AdminConfig';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import Investment from './pages/Investment';
+import InvestmentHistory from './pages/InvestmentHistory';
 import Login from './pages/Login';
 import './index.css';
 
@@ -54,6 +55,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute requiredRole="SUPERADMIN">
               <SuperAdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="investment-history"
+          element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <InvestmentHistory />
             </ProtectedRoute>
           }
         />

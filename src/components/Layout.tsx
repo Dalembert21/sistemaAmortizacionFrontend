@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Calculator, Settings, PieChart, LayoutDashboard, Building2, Lock, LogOut, FileCode, Menu, X } from 'lucide-react';
+import { Calculator, Settings, PieChart, LayoutDashboard, Building2, Lock, LogOut, FileCode, Menu, X, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
@@ -24,6 +24,7 @@ const Layout = () => {
     { path: '/dashboard', label: 'Inicio', icon: <LayoutDashboard size={18} /> },
     { path: '/simulator', label: 'Simulador Crédito', icon: <Calculator size={18} /> },
     { path: '/investment', label: 'Inversiones', icon: <PieChart size={18} /> },
+    ...(role === 'ADMIN' || role === 'SUPERADMIN' ? [{ path: '/investment-history', label: 'Historial Inversiones', icon: <TrendingUp size={18} /> }] : []),
     {
       path: (role === 'ADMIN' || role === 'SUPERADMIN') ? '/admin' : '/login',
       label: 'Configuración Institución',
