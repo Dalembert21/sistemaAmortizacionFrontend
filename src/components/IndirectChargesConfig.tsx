@@ -142,43 +142,7 @@ const IndirectChargesConfig = ({
     onChargesUpdate(updatedCharges);
   };
 
-  const handleEditCharge = (id: number, field: keyof IndirectCharge, value: any) => {
-    setCharges(charges.map(charge => 
-      charge.id === id ? { ...charge, [field]: value } : charge
-    ));
-  };
-
-  const handleSaveEdit = (id: number) => {
-    setEditingId(null);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    // Restaurar valores originales
-    const original = originalCharges.find(ch => ch.id === editingId);
-    if (original) {
-      setCharges(charges.map(charge => 
-        charge.id === editingId ? original : charge
-      ));
-    }
-  };
-
-  const getCalculationBaseLabel = (base: string) => {
-    switch (base) {
-      case 'INITIAL_BALANCE': return 'Saldo Inicial';
-      case 'CURRENT_BALANCE': return 'Saldo Actual';
-      case 'FIXED_AMOUNT': return 'Monto Fijo';
-      default: return base;
-    }
-  };
-
-  const formatValue = (charge: IndirectCharge) => {
-    if (charge.chargeType === 'PERCENTAGE') {
-      return `${charge.value}%`;
-    }
-    return `$${charge.value.toFixed(2)}`;
-  };
-
+  
   return (
     <div className="glass-panel">
       <h3 className="mb-4">Configuración de Cobros Indirectos</h3>
