@@ -136,7 +136,7 @@ const AdminConfig = () => {
     <div className="flex flex-col gap-4 max-w-6xl">
       <div className="flex justify-between items-center">
         <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Settings color="var(--primary-light)" /> Configuración de la Institución
+          <Settings color="var(--primary)" /> Configuración de la Institución
         </h2>
         <button 
           className="btn btn-primary" 

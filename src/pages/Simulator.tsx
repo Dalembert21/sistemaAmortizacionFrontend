@@ -93,7 +93,7 @@ const Simulator = () => {
   return (
     <div className="flex flex-col gap-4" style={{ maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
       <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Calculator color="var(--primary-light)" /> Simulador de Créditos
+        <Calculator color="var(--primary)" /> Simulador de Créditos
       </h2>
 
       <div className="simulator-grid" style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '1.5rem' }}>

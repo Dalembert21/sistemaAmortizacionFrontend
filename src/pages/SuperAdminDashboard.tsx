@@ -97,7 +97,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="flex flex-col gap-4 max-w-4xl">
       <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Building color="var(--primary-light)" /> Gestión de Cooperativas / Bancos
+        <Building color="var(--primary)" /> Gestión de Cooperativas / Bancos
       </h2>
 
       <div className="glass-panel text-left">

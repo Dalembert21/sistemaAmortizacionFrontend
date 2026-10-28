@@ -144,7 +144,7 @@ const InvestmentHistory = () => {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2">
-          <TrendingUp color="var(--primary-light)" />
+          <TrendingUp color="var(--primary)" />
           Historial de Inversiones
         </h2>
         <div className="text-sm text-muted">

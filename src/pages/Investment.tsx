@@ -325,7 +325,7 @@ const Investment = () => {
 
       setUploadingDoc(true);
 
-      setValidationError('Extrayendo rasgos faciales del documento con IA...');
+      setValidationError('Extrayendo rasgos faciales del documento...');
 
       
 
@@ -371,7 +371,7 @@ const Investment = () => {
 
           } else {
 
-            setValidationError('🚫 RESOLUCIÓN IA: Este documento no es una Cédula de Identidad legal.');
+            setValidationError('🚫 Documento no válido: Este documento no corresponde a una Cédula de Identidad legal.');
 
             setIsCedulaValid(false);
 
@@ -381,7 +381,7 @@ const Investment = () => {
 
       } catch (err) {
 
-        setValidationError('Error de conexión con el motor de IA.');
+        setValidationError('Error al procesar la validación del documento.');
 
       }
 
@@ -477,7 +477,7 @@ const Investment = () => {
 
       <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
 
-        <Building color="var(--secondary-light)" /> Simulador de Inversiones
+        <Building color="var(--primary)" /> Simulador de Inversiones
 
       </h2>
 
@@ -617,7 +617,7 @@ const Investment = () => {
 
             {/* Datos de la Inversión */}
             <div>
-              <h4 style={{ marginBottom: '1rem', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h4 style={{ marginBottom: '1rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <ExternalLink size={18} /> Parámetros de Inversión
               </h4>
               <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
@@ -662,7 +662,7 @@ const Investment = () => {
 
 
 
-            <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+            <div style={{ marginTop: '2rem', padding: '1.5rem', background: '#ecfdf5', borderRadius: 'var(--radius-lg)', border: '1px solid #a7f3d0' }}>
 
               <h4 style={{ margin: 0, color: '#059669', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
 
@@ -722,9 +722,9 @@ const Investment = () => {
 
           <motion.div key="step2" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="glass-panel text-center">
 
-            <h3>Validación de Identidad Inteligente</h3>
+            <h3>Validación de Identidad</h3>
 
-            <p>Para asegurar tu identidad, la IA comparará la foto de tu cédula con tu rostro real.</p>
+            <p>Para asegurar tu identidad, el sistema comparará la foto de tu cédula con tu rostro real.</p>
 
             
 
@@ -802,7 +802,7 @@ const Investment = () => {
 
                         transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
 
-                        style={{ position: 'absolute', width: '100%', height: '4px', background: '#e6621f', boxShadow: '0 0 15px #e6621f' }}
+                        style={{ position: 'absolute', width: '100%', height: '3px', background: 'var(--primary)' }}
 
                       />
 
@@ -890,7 +890,7 @@ const Investment = () => {
 
                   <h4 style={{ color: banco.color, marginBottom: '0.2rem' }}>{banco.name}</h4>
 
-                  <div style={{ background: 'rgba(var(--primary-rgb), 0.1)', padding: '0.5rem', borderRadius: 'var(--radius-sm)', color: 'var(--primary)', fontWeight: '700', fontSize: '0.9rem' }}>
+                  <div style={{ background: '#fff7ed', border: '1px solid #ffedd5', padding: '0.5rem', borderRadius: 'var(--radius-sm)', color: 'var(--primary)', fontWeight: '700', fontSize: '0.9rem' }}>
 
                     Tasa: {banco.rate}
 

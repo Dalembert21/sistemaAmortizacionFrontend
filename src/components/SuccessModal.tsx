@@ -18,7 +18,6 @@ const SuccessModal = ({ isOpen, onClose, title, message }: SuccessModalProps) =>
       right: 0,
       bottom: 0,
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      backdropFilter: 'blur(4px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
