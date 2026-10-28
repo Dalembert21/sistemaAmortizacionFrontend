@@ -96,10 +96,24 @@ const Layout = () => {
         ))}
       </nav>
 
+      <div style={{ borderTop: '1px solid var(--border)', padding: '0.75rem 0.5rem', width: '100%', textAlign: 'center' }}>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          Creado por <strong style={{ color: 'var(--text)' }}>Dalembert Bravo</strong>
+        </span>
+      </div>
+
       {role !== 'GUEST' && (
         <div style={{ borderTop: '1px solid var(--border)', padding: '1rem 0.5rem', width: '100%' }}>
           <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="btn w-full hover:bg-surface-light" style={{ background: 'transparent', color: 'var(--danger)', display: 'flex', justifyContent: 'flex-start', padding: '0.75rem 1rem', fontSize: '0.9rem', gap: '0.75rem' }}>
             <LogOut size={18} /> Cerrar Sesión
+
+
+      <div style={{ borderTop: '1px solid var(--border)', padding: '0.75rem 0.5rem', width: '100%', textAlign: 'center' }}>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          Creado por <strong style={{ color: 'var(--text)' }}>Dalembert Bravo</strong>
+        </span>
+      </div>
+
           </button>
         </div>
       )}

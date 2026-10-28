@@ -87,6 +87,10 @@ const Login = () => {
             Ingresar <LogIn size={18} />
           </button>
         </form>
+
+        <div style={{ marginTop: '1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
+          Creado por <strong style={{ color: 'var(--text)' }}>Dalembert Bravo</strong>
+        </div>
       </div>
     </div>
   );

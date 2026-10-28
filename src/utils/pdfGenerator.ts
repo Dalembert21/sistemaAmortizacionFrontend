@@ -96,5 +96,10 @@ export const generatePDF = (table: AmortizationRow[], institutionName: string, c
     } catch (e) {}
   }
 
+  // Pie de pagina
+  doc.setFontSize(8);
+  doc.setTextColor(140);
+  doc.text('Plataforma Financiera - Creado por Dalembert Bravo', 14, 285);
+
   doc.save(`Tabla_Amortizacion_${clientName}.pdf`);
 };

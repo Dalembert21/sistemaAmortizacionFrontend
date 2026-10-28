@@ -48,6 +48,10 @@ const Dashboard = () => {
           </Link>
         </div>
       </div>
+
+      <div style={{ textAlign: 'center', marginTop: '1.5rem', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+        Plataforma Financiera &bull; Creado por <strong style={{ color: 'var(--text)' }}>Dalembert Bravo</strong>
+      </div>
     </div>
   );
 };
